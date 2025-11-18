@@ -1,0 +1,145 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+.home-page {
+  background: #f8fafc;
+  color: #222;
+  min-height: 100vh;
+}
+
+/* Header */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0d1b2a;
+  color: white;
+  padding: 15px 60px;
+}
+
+.home-header .logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.home-header nav ul {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+.home-header nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.home-header nav a:hover {
+  color: #00b4d8;
+}
+
+.logout-btn {
+  background: #00b4d8;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Hero */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80px 100px;
+  background: linear-gradient(to right, #edf2f4, #d9edff);
+}
+
+.hero-text {
+  max-width: 50%;
+}
+
+.hero-text h1 {
+  font-size: 2.8rem;
+  color: #1a1a1a;
+}
+
+.hero-text h1 span {
+  color: #0077b6;
+}
+
+.hero-text p {
+  margin-top: 15px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.explore-btn {
+  margin-top: 25px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.explore-btn:hover {
+  background: #023e8a;
+}
+
+.hero-image img {
+  width: 400px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* Features */
+.features {
+  display: flex;
+  justify-content: space-around;
+  background: white;
+  padding: 70px 40px;
+}
+
+.feature {
+  text-align: center;
+  max-width: 280px;
+}
+
+.feature h2 {
+  color: #0077b6;
+  margin-bottom: 10px;
+}
+
+.feature p {
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  background: #0d1b2a;
+  color: white;
+  padding: 20px;
+  font-size: 0.9rem;
+}
+
+.logo-section {
+  align-items: center;
+  padding-bottom: 700px;
+  flex: 1;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

@@ -1,0 +1,165 @@
+/* Full-page background */
+/* body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url("/src/assets/bg.jpg") no-repeat center center/cover;
+} */
+
+ body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  align-items: center;
+  justify-content: center;
+ }
+
+/* Reset unwanted background from * selector */
+* {
+  box-sizing: border-box;
+}
+
+
+/* The login card */
+.login-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 40px;
+  width: 350px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  
+}
+
+/* Main container */
+.login-container {
+  background: transparent;
+  border-radius: 8px;
+  display: flex;
+  width: 700px;
+  max-width: 95%; /* Responsive on smaller screens */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Form section */
+.login-form {
+  flex: 1;
+  padding: 30px;
+}
+
+.login-form h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 40px;
+  color: white;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #3a3838;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  /* border-radius: 50px; */
+  
+}
+
+/* Role selection */
+.roles {
+  margin: 10px 0;
+  display: flex;
+  gap: 15px;
+  
+}
+.roles label {
+
+  font-size: 14px;
+  color: rgb(56, 56, 90);
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 12px;
+  background :rgb(56, 56, 90);
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+}
+button:hover {
+  background :rgb(76, 76, 108);
+}
+
+/* Links */
+.links {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+.links a {
+  color: #007bff;
+  text-decoration: none;
+}
+.links a:hover {
+  text-decoration: underline;
+}
+
+/* Logo section */
+.logo-section {
+  flex: 1;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.logo-section img {
+  max-width: 250px;
+  margin-bottom: 12px;
+ border-radius: 200px 200px 200px;
+
+}
+.logo-section h1 {
+  font-size: 20px;
+  margin: 0;
+  color: #222;
+}
+.logo-section p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* 🔹 Responsive: Stack form & logo vertically on small screens */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    width: 90%;
+  }
+
+  .logo-section {
+    padding: 15px;
+  }
+
+  .logo-section img {
+    max-width: 120px;
+  }
+
+
+}
