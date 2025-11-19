@@ -7,6 +7,9 @@ import HomePage from "./Pages/UserPage/HomePage";
 import StudentDashboard from "./Pages/UserPage/UserPage";
 import AdminLayout from "./Components/Admin/Pages/AdminLayout";
 import Dashboard from "./Components/Admin/Pages/Dashboard";
+import FacultyGradePage from "./Components/Admin/Pages/Faculty";
+import StudentGradeTable from "./Components/Admin/Pages/Studenttable";
+import RegisterPage from "./Pages/Registerpage";
 
 
 function App() {
@@ -15,6 +18,7 @@ function App() {
       {/* Public Routes */}
       <Route path="/" element={<GradePredictionLanding />} />
       <Route path="/login" element={<Loginpage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/user" element={<StudentDashboard />} />
       <Route path="/home" element={<HomePage />} />
 
@@ -27,6 +31,8 @@ function App() {
           </AdminLayout>
         }
       />
+      <Route path="/faculty" element={<FacultyGradePage />} />
+      <Route path="/stdtable" element={<StudentGradeTable />} />
     </Routes>
   );
 }
