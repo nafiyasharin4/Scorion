@@ -1,8 +1,8 @@
 import React from 'react';
 import { BarChart3, TrendingUp, BookOpen, Award, Calendar, Target, AlertCircle } from 'lucide-react';
-import AdminHeader from '../Components/Header';
+import TeacherHeader from '../Components/Header';
 
-export default function Dashboard() {
+export default function FacultyDashboard() {
   const courses = [
     { name: 'Mathematics', current: 85, predicted: 88, progress: 75, color: 'bg-blue-500' },
     { name: 'Physics', current: 78, predicted: 82, progress: 60, color: 'bg-purple-500' },
@@ -31,7 +31,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <AdminHeader></AdminHeader>
+      <TeacherHeader></TeacherHeader>
     <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className=" mx-auto">
         {/* Header */}

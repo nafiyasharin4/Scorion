@@ -98,15 +98,9 @@ export default function LoginPage() {
 
           {/* Footer Links */}
           <div className="mt-6 text-center space-y-2">
-            <a href="#" className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">
+            <a href="/forgotpass" className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">
               Forgot your password?
             </a>
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <a href="#" className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-200">
-                Sign up
-              </a>
-            </p>
           </div>
         </div>
 

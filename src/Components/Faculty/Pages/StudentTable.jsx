@@ -1,8 +1,7 @@
-// App.js
 import React, { useState } from 'react';
-import StudentList from '../Components/StudentManage/StudentList';
+import TeacherHeader from '../Components/Header';
+import StudentListTable from '../Components/StudentManage/StudentList';
 import StudentModal from '../Components/StudentManage/StudentModal';
-import AdminHeader from '../Components/Header';
 
 // Mock data
 const initialStudents = [
@@ -58,7 +57,7 @@ const initialStudents = [
   }
 ];
 
-function App() {
+function TeacherStuendtTable() {
   const [students, setStudents] = useState(initialStudents);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
@@ -106,7 +105,7 @@ function App() {
 
   return (
     <div>
-      <AdminHeader></AdminHeader>
+      <TeacherHeader></TeacherHeader>
     <div className="min-h-screen bg-gray-50 mt-5">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -194,7 +193,7 @@ function App() {
         </div>
 
         {/* Student List */}
-        <StudentList
+        <StudentListTable
           students={students}
           onEdit={handleEditStudent}
           onDelete={handleDeleteStudent}
@@ -214,4 +213,4 @@ function App() {
   );
 }
 
-export default App;
+export default TeacherStuendtTable;

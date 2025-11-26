@@ -1,36 +1,20 @@
 import React from 'react';
 import { GraduationCap } from 'lucide-react';
+import Header from '../../Components/UserSide/Header';
+import { useNavigate } from 'react-router-dom';
 
 export default function GradePredictorHome() {
+  const navigate = useNavigate();
+
+  const handleExplore = () => {
+    navigate('/user1');
+  }
   return (
+    <div>
+      <Header></Header>
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
       {/* Header/Navigation */}
-      <nav className="bg-slate-800 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <GraduationCap className="text-cyan-400 w-8 h-8" />
-              <h1 className="text-xl font-bold text-cyan-400">
-                SCORION
-              </h1>
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#" className="text-white hover:text-cyan-400 font-medium transition">Home</a>
-              <a href="#" className="text-white hover:text-cyan-400 font-medium transition">Courses</a>
-              <a href="#" className="text-white hover:text-cyan-400 font-medium transition">Community</a>
-              <a href="#" className="text-white hover:text-cyan-400 font-medium transition">About</a>
-            </div>
-
-            {/* Logout Button */}
-            <button className="px-5 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition">
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
+      
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -52,7 +36,7 @@ export default function GradePredictorHome() {
               Your personalized student platform — Learn, Grow, and Connect with confidence.
             </p>
 
-            <button className="px-8 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 transition shadow-lg hover:shadow-xl">
+            <button onClick={handleExplore} className="px-8 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 transition shadow-lg hover:shadow-xl">
               Explore Now
             </button>
           </div>
@@ -69,6 +53,7 @@ export default function GradePredictorHome() {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }

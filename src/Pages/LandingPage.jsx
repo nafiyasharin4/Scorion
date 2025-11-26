@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 // import '../Component/Landing.css';
 import "../Styles/Landing.css"
+import { useNavigate } from 'react-router-dom';
 
 const GradePredictionLanding = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const navigate = useNavigate()
+
+  const handleButtonClick = () => {
+    navigate('/home');
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,14 +88,11 @@ const GradePredictionLanding = () => {
                 and achieve your academic goals with confidence.
               </p>
               <div className="hero-buttons">
-                <button className="primary-button">
+                <button className="primary-button" onClick={handleButtonClick}>
                   Start Predicting
                   <span className="button-arrow">→</span>
                 </button>
-                <button className="secondary-button">
-                  <span className="play-icon">▶</span>
-                  Watch Demo
-                </button>
+                
               </div>
               <div className="hero-stats">
                 <div className="stat">
@@ -214,7 +217,7 @@ const GradePredictionLanding = () => {
           <div className="cta-content">
             <h2 className="cta-title">Ready to Transform Your Academic Journey?</h2>
             <p className="cta-text">Join thousands of students who are already predicting and improving their grades</p>
-            <button className="cta-large-button">
+            <button onClick={handleButtonClick} className="cta-large-button">
               Get Started Free
               <span className="button-arrow">→</span>
             </button>
