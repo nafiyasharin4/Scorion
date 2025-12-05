@@ -27,6 +27,7 @@ function Header() {
               <a href="/courses" className="text-white hover:text-cyan-400 font-medium transition">Courses</a>
               <a href="/community" className="text-white hover:text-cyan-400 font-medium transition">Community</a>
               <a href="/about" className="text-white hover:text-cyan-400 font-medium transition">About</a>
+              
             </div>
 
             {/* Logout Button */}

@@ -19,6 +19,8 @@ import ResetPasswordPage from "./Pages/Resetpass";
 import FacultyDashboard from "./Components/Faculty/Pages/Dashboard";
 import TeacherStuendtTable from "./Components/Faculty/Pages/StudentTable";
 import MarkManagePage from "./Components/Faculty/Pages/MarksManage";
+import AdminLogin from "./Pages/AdminLogin";
+import CreatePasswordPage from "./Pages/CreatePass";
 
 
 
@@ -38,11 +40,14 @@ function App() {
       <Route path="/forgotpass" element={<ForgotPassword />} />
       <Route path="/forgotcode" element={<OTPVerification />} />
       <Route path="/resetpass" element={<ResetPasswordPage />} />
+      <Route path="/createpass" element={<CreatePasswordPage />} />
+      
 
       {/* Admin Routes using AdminLayout */}
       <Route path="/admin/dashboard" element={<Dashboard />} />
       <Route path="/admin/faculty" element={<FacultyGradePage />} />
       <Route path="/admin/stdtable" element={<StudentGradeTable />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
 
       <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
       <Route path="/faculty/students" element={<TeacherStuendtTable />} />
