@@ -182,6 +182,11 @@ export default function OTPVerification() {
           </button>
 
           {/* Back Button */}
+           <div className="mt-6 text-center">
+            <a
+              href="/forgotpass"
+              className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
           <button
             onClick={handleBackToEmail}
             className="w-full text-indigo-600 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors duration-200 flex items-center justify-center gap-2"
@@ -189,6 +194,8 @@ export default function OTPVerification() {
             <ArrowLeft className="w-5 h-5" />
             Change Email Address
           </button>
+          </a>
+          </div>
         </div>
 
         {/* Help Text */}

@@ -8,7 +8,6 @@ import Dashboard from "./Components/Admin/Pages/Dashboard";
 import FacultyGradePage from "./Components/Admin/Pages/Faculty";
 import StudentGradeTable from "./Components/Admin/Pages/Studenttable";
 import StudentProfile from "./Pages/UserPage/UserPage";
-import CoursesPage from "./Pages/UserPage/Courses";
 import CommunityPage from "./Pages/UserPage/Community";
 import AboutPage from "./Pages/UserPage/AboutPage";
 import GradePredictionResult from "./Pages/UserPage/GradePredictionResult";
@@ -21,6 +20,8 @@ import TeacherStuendtTable from "./Components/Faculty/Pages/StudentTable";
 import MarkManagePage from "./Components/Faculty/Pages/MarksManage";
 import AdminLogin from "./Pages/AdminLogin";
 import CreatePasswordPage from "./Pages/CreatePass";
+import CoursesPage from "./Pages/UserPage/courses";
+import ParentAttendanceAlert from "./Pages/UserPage/Notification";
 
 
 
@@ -32,9 +33,10 @@ function App() {
       <Route path="/login" element={<Loginpage />} />
       <Route path="/user1" element={<StudentProfile />} />
       <Route path="/home" element={<HomePage />} />
-      <Route path="/courses" element={<CoursesPage />} />
+       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/community" element={<CommunityPage />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route path="/notification" element={<ParentAttendanceAlert />} />
       <Route path="/GPresult" element={<GradePredictionResult />} />
       <Route path="/DBlogin" element={<DashboardLoginPage />} />
       <Route path="/forgotpass" element={<ForgotPassword />} />
