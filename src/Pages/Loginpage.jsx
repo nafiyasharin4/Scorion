@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     isFaculty: false
   });
 
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -15,16 +23,40 @@ export default function LoginPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // Submit login
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    alert(`Login as ${formData.isFaculty ? 'Faculty' : 'User'}\nEmail: ${formData.email}`);
+    setError("");
+    setLoading(true);
+
+    try {
+      const url = "http://localhost:5000/api/admin/login";
+
+      const res = await axios.post(url, {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      console.log("Login Success:", res.data);
+      localStorage.setItem("token", res.data.token);
+      if(res.data.token){
+      navigate("/home");  
+      }
+
+      // redirect after login
+      
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    }
+
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10">
+
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4">
@@ -33,86 +65,83 @@ export default function LoginPage() {
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-gray-900">SCORION</h2>
-            <p className="text-gray-600 mt-2">Login in to your account</p>
+            <p className="text-gray-600 mt-2">Login to your account</p>
           </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="mb-4 bg-red-100 border border-red-300 text-red-700 p-3 text-center rounded">
+              {error}
+            </div>
+          )}
 
           {/* Form */}
           <div className="space-y-6">
-            {/* Email Field */}
+            {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <input
                 type="email"
-                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 placeholder="you@example.com"
               />
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <input
                 type="password"
-                id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 placeholder="••••••••"
               />
             </div>
 
-            {/* Faculty Checkbox */}
+            {/* Faculty checkbox */}
             <div className="flex items-center">
               <input
                 type="checkbox"
-                id="isFaculty"
                 name="isFaculty"
                 checked={formData.isFaculty}
                 onChange={handleChange}
                 className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
-              <label htmlFor="isFaculty" className="ml-3 text-sm font-medium text-gray-700">
-                I am a Faculty Member
-              </label>
+              <label className="ml-3 text-sm font-medium text-gray-700">I am a Faculty Member</label>
             </div>
 
-            {/* Submit Button */}
+            {/* Button */}
             <button
               onClick={handleSubmit}
-              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50"
             >
-              LOGIN
+              {loading ? "Logging in..." : "LOGIN"}
             </button>
           </div>
 
-          {/* Footer Links */}
+          {/* Footer */}
           <div className="mt-6 text-center space-y-2">
-            <a href="/forgotpass" className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">
+            <a href="/forgotpass" className="text-sm text-indigo-600 hover:text-indigo-800">
               Forgot your password?
             </a>
           </div>
-         <div className="mt-6 flex items-center justify-center gap-1 text-center">
-       <p className="text-sm">Don't have an account?</p>
-        <a
-        href="/register"
-       className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200"
-       >
-       Sign in
-       </a>
-       </div>
 
-      </div>
+          <div className="mt-6 flex items-center justify-center gap-1 text-center">
+            <p className="text-sm">Don't have an account?</p>
+            <a href="/register" className="text-sm text-indigo-600 hover:text-indigo-800">
+              Sign up
+            </a>
+          </div>
+
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mail, ArrowLeft, CheckCircle, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+
 
 export default function ForgotPassword() {
   const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password, 4: Success
@@ -22,9 +24,39 @@ export default function ForgotPassword() {
     }
   }, [countdown]);
 
-  const handleSendOTP = () => {
-    navigate('/forgotcode');
-  };
+const handleSendOTP = async () => {
+  setError('');
+
+  if (!email) {
+    setError("Please enter your email");
+    return;
+  }
+
+  try {
+    setIsLoading(true);
+
+    console.log(email,"llllllllllll");
+    
+    const response = await axios.post(
+      "http://localhost:5000/api/admin/forgot-password",
+      { email }
+    );
+
+    console.log(response.data,"llllllllllll");
+    if(response.data.success){
+      navigate("/resetpass",{state:{email}});
+
+    }
+
+    setIsLoading(false);
+    setStep(2); // move to OTP screen
+
+  } catch (error) {
+    setIsLoading(false);
+    setError(error.response?.data?.message || "Something went wrong");
+  }
+};
+
 
   const handleOtpChange = (index, value) => {
     if (value.length > 1) {

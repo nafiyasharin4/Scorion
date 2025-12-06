@@ -48,8 +48,8 @@ export default function RegisterPage() {
             axios.post("http://localhost:5000/api/admin/register", formData)
                 .then((res) => {
                     console.log("Registration success:", res.data);
-                    if(res.data.success){
-                            navigate("/forgotcode");
+                    if (res.data.success) {
+                        navigate("/forgotcode", { state: { email: formData.email } });
                     }
 
 

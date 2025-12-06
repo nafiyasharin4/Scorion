@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mail, ArrowLeft, Shield } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function OTPVerification() {
@@ -8,8 +8,11 @@ export default function OTPVerification() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [countdown, setCountdown] = useState(60);
-  const [email] = useState('student@example.com'); 
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
+  console.log(email,"email");
+  
 
   const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
@@ -67,13 +70,13 @@ export default function OTPVerification() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/verify-forgot-otp", {
+      const res = await axios.post("http://localhost:5000/api/admin/verify-otp", {
         email,
         otp: code
       });
 
       if (res.data.success) {
-        navigate('/resetpass');
+        navigate('/admin/login');
       } else {
         setError("Invalid OTP");
       }
@@ -84,25 +87,36 @@ export default function OTPVerification() {
     setIsLoading(false);
   };
 
-  const handleResendOTP = () => {
-    if (countdown > 0) return;
+const handleResendOTP = async () => {
+  if (countdown > 0 || isLoading) return;
 
-    setIsLoading(true);
-    setError('');
+  setIsLoading(true);
+  setError("");
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setCountdown(60);
-      setOtp(['', '', '', '', '', '']);
-      otpRefs[0].current?.focus();
+  console.log(email,"emailljhhh");
+  
+  try {
+    const res = await axios.post("http://localhost:5000/api/admin/resend-otp", {
+      email,
+    });
 
-      const successMsg = document.getElementById('resend-success');
-      if (successMsg) {
-        successMsg.classList.remove('hidden');
-        setTimeout(() => successMsg.classList.add('hidden'), 3000);
-      }
-    }, 1000);
-  };
+    // OTP sent successfully
+    setCountdown(30);
+    setOtp(["", "", "", "", "", ""]);
+    otpRefs[0].current?.focus();
+
+    const successMsg = document.getElementById("resend-success");
+    if (successMsg) {
+      successMsg.classList.remove("hidden");
+      setTimeout(() => successMsg.classList.add("hidden"), 3000);
+    }
+  } catch (err) {
+    setError(err.response?.data?.message || "Failed to resend OTP");
+  }
+
+  setIsLoading(false);
+};
+
 
   const handleBackToEmail = () => {
     navigate('/forgotpass');

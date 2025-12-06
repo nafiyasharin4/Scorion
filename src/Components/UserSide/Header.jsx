@@ -1,12 +1,26 @@
 import { GraduationCap, Bell } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Header() {
     const navigate = useNavigate();
     const [notificationCount] = useState(4);
 
+    // State to track login status
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        setIsLoggedIn(!!token); // true if token exists
+    }, []);
+
     const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        navigate('/login');
+    };
+
+    const handleLogin = () => {
         navigate('/login');
     };
 
@@ -46,12 +60,22 @@ function Header() {
                         </button>
                     </div>
 
-                    <button
-                        onClick={handleLogout}
-                        className="px-5 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition"
-                    >
-                        Login
-                    </button>
+                    {/* Login / Logout Button */}
+                    {isLoggedIn ? (
+                        <button
+                            onClick={handleLogout}
+                            className="px-5 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleLogin}
+                            className="px-5 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition"
+                        >
+                            Login
+                        </button>
+                    )}
                 </div>
             </div>
         </nav>
