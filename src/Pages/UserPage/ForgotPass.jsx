@@ -377,15 +377,7 @@ export default function ForgotPassword() {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-600">
-            Need help?{' '}
-            <a href="#" className="text-indigo-600 hover:text-indigo-700 font-semibold">
-              Contact Support
-            </a>
-          </p>
-        </div>
+       
       </div>
     </div>
   );

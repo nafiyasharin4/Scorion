@@ -8,7 +8,7 @@ export default function OTPVerification() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [countdown, setCountdown] = useState(60);
-  const [email] = useState('student@example.com'); // This would come from previous page
+  const [email] = useState('student@example.com'); 
   const navigate = useNavigate();
 
   const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
@@ -105,10 +105,9 @@ export default function OTPVerification() {
   };
 
   const handleBackToEmail = () => {
-    navigate('/forgot'); // go back to email page
+    navigate('/forgotpass');
   };
 
-  // NOW the return is inside the component
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -142,8 +141,9 @@ export default function OTPVerification() {
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  className={`w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 ${error ? 'border-red-500' : 'border-gray-300'
-                    } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all`}
+                  className={`w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 ${
+                    error ? 'border-red-500' : 'border-gray-300'
+                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all`}
                 />
               ))}
             </div>
@@ -182,7 +182,6 @@ export default function OTPVerification() {
           </button>
 
         </div>
-
       </div>
     </div>
   );
