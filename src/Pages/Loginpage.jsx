@@ -102,15 +102,17 @@ export default function LoginPage() {
               Forgot your password?
             </a>
           </div>
-        </div>
+         <div className="mt-6 flex items-center justify-center gap-1 text-center">
+       <p className="text-sm">Don't have an account?</p>
+        <a
+        href="/register"
+       className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200"
+       >
+       Sign in
+       </a>
+       </div>
 
-        {/* Additional Info */}
-        <p className="text-center text-sm text-gray-600 mt-6">
-          By signing in, you agree to our{' '}
-          <a href="#" className="text-indigo-600 hover:text-indigo-800">Terms</a>
-          {' '}and{' '}
-          <a href="#" className="text-indigo-600 hover:text-indigo-800">Privacy Policy</a>
-        </p>
+      </div>
       </div>
     </div>
   );
