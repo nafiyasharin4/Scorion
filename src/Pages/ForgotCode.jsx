@@ -67,7 +67,7 @@ export default function OTPVerification() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/verify-forgot-otp", {
+      const res = await axios.post("http://localhost:5000/api/admin/verify-otp", {
         email,
         otp: code
       });
