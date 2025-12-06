@@ -2,7 +2,7 @@ import { GraduationCap } from 'lucide-react'
 import React, { use } from 'react'
 import { useNavigate } from 'react-router-dom';
 
-function AdminHeader() {
+function TeacherHeader() {
     const navigate = useNavigate();
     const handleLogout = () => {
         
@@ -17,15 +17,15 @@ function AdminHeader() {
             <div className="flex items-center gap-2">
               <GraduationCap className="text-cyan-400 w-8 h-8" />
               <h1 className="text-xl font-bold text-cyan-400">
-                ADMIN SCORION
+                TEACHER SCORION
               </h1>
             </div>
 
             {/* Navigation Links */}
             <div className="hidden md:flex items-center gap-8">
-              <a href="/admin/dashboard" className="text-white hover:text-cyan-400 font-medium transition">Dashboard</a>
-              <a href="/admin/stdtable" className="text-white hover:text-cyan-400 font-medium transition">Students</a>
-              <a href="/admin/faculty" className="text-white hover:text-cyan-400 font-medium transition">Teachers</a>
+              <a href="/faculty/dashboard" className="text-white hover:text-cyan-400 font-medium transition">Dashboard</a>
+              <a href="/faculty/students" className="text-white hover:text-cyan-400 font-medium transition">Students</a>
+              <a href="/faculty/marks" className="text-white hover:text-cyan-400 font-medium transition">Marks</a>
             </div>
 
             {/* Logout Button */}
@@ -39,4 +39,4 @@ function AdminHeader() {
   )
 }
 
-export default AdminHeader
+export default TeacherHeader
