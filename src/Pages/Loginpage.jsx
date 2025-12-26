@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -17,8 +20,11 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     console.log('Login attempt:', formData);
-    alert(`Login as ${formData.isFaculty ? 'Faculty' : 'User'}\nEmail: ${formData.email}`);
+
+    // after successful login
+    navigate('/admin/dashboard'); // ✅ works
   };
 
   return (
