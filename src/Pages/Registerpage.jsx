@@ -48,8 +48,10 @@ export default function RegisterPage() {
             axios.post("http://localhost:5000/api/admin/register", formData)
                 .then((res) => {
                     console.log("Registration success:", res.data);
-                    if(res.data.success){
-                            navigate("/forgotcode");
+                    if (res.data.success) {
+                        navigate("/forgotcode", {
+                            state: { email: formData.email }
+                        });
                     }
 
 
@@ -70,7 +72,7 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-4xl">
+            <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="inline-block p-3 bg-indigo-600 rounded-full mb-4">

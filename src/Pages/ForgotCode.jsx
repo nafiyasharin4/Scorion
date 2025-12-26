@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mail, ArrowLeft, Shield } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,useLocation} from 'react-router-dom';
 import axios from 'axios';
 
 export default function OTPVerification() {
+  const location = useLocation();
+  const emailFromState = location.state?.email || '';
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [countdown, setCountdown] = useState(60);
-  const [email] = useState('student@example.com'); 
+  const [email] = useState(emailFromState); 
   const navigate = useNavigate();
 
   const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
@@ -67,7 +69,7 @@ export default function OTPVerification() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/verify-forgot-otp", {
+      const res = await axios.post("http://localhost:5000/api/admin/verify-otp", {
         email,
         otp: code
       });
@@ -105,7 +107,7 @@ export default function OTPVerification() {
   };
 
   const handleBackToEmail = () => {
-    navigate('/forgotpass');
+    navigate('/resetpass');
   };
 
   return (
