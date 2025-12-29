@@ -1,18 +1,49 @@
 // components/TeacherList.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const TeacherList = ({ teachers, onEdit, onDelete }) => {
+const TeacherList = ({ onEdit, onDelete }) => {
+  const [teachers, setTeachers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
 
+  // 🔹 FETCH TEACHERS FROM BACKEND
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const response = await axios.get(
+          'http://localhost:5000/api/admin/teachers',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        // supports both { teachers: [] } or []
+        setTeachers(response.data.teachers || response.data);
+      } catch (error) {
+        console.error(error);
+        alert(error.response?.data?.message || 'Failed to load teachers');
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
   const filteredTeachers = teachers.filter(teacher => {
-    const matchesSearch = teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         teacher.subject.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      teacher.subject.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStatus = statusFilter === 'all' || teacher.status === statusFilter;
-    const matchesDepartment = departmentFilter === 'all' || teacher.department === departmentFilter;
-    
+    const matchesDepartment =
+      departmentFilter === 'all' || teacher.department === departmentFilter;
+
     return matchesSearch && matchesStatus && matchesDepartment;
   });
 
@@ -22,13 +53,12 @@ const TeacherList = ({ teachers, onEdit, onDelete }) => {
       'on-leave': 'bg-yellow-100 text-yellow-800 border border-yellow-200 shadow-sm',
       inactive: 'bg-red-100 text-red-800 border border-red-200 shadow-sm'
     };
-    
+
     const statusLabels = {
       active: 'Active',
       'on-leave': 'On Leave',
       inactive: 'Inactive'
     };
-    
     return (
       <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${statusStyles[status]}`}>
         {statusLabels[status]}

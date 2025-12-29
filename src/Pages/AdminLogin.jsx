@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, GraduationCap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function AdminLogin() {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -9,8 +13,20 @@ export default function AdminLogin() {
   });
 
   const handleSubmit = () => {
-    console.log('Login attempted with:', formData);
-    alert(`Login attempt:\nEmail: ${formData.email}\nPassword: ${'*'.repeat(formData.password.length)}`);
+    navigate('/admin/dashboard');
+    const response = axios.post('http://localhost:5000/api/admin/login', {
+      email: formData.email,
+      password: formData.password
+    }).then((res) => {
+      console.log("Login Success:", res.data);
+      localStorage.setItem("token", res.data.token);
+      if (res.data.token) {
+        navigate("/admin/dashboard");
+      }
+    }).catch((err) => {
+      console.log("Login Failed:", err.response?.data?.message || "Login failed");
+    });
+  
   };
 
   const handleChange = (e) => {
@@ -25,7 +41,6 @@ export default function AdminLogin() {
       handleSubmit();
     }
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">

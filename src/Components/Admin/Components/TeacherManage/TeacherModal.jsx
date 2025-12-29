@@ -1,7 +1,10 @@
 // components/TeacherModal.js
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const TeacherModal = ({ teacher, onSave, onClose }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,6 +19,7 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (teacher) {
@@ -37,50 +41,63 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters long';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email address is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    if (!formData.name.trim()) newErrors.name = 'Full name is required';
+    if (!formData.email.trim()) newErrors.email = 'Email address is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    }
-
-    if (!formData.department.trim()) {
-      newErrors.department = 'Department selection is required';
-    }
-
-    if (!formData.subject.trim()) {
-      newErrors.subject = 'Subject is required';
-    }
-
-    if (!formData.qualification.trim()) {
-      newErrors.qualification = 'Qualification is required';
-    }
-
-    if (!formData.experience.trim()) {
-      newErrors.experience = 'Experience information is required';
-    }
-
-    if (!formData.salary.trim()) {
-      newErrors.salary = 'Salary information is required';
-    }
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+    if (!formData.department.trim()) newErrors.department = 'Department selection is required';
+    if (!formData.subject.trim()) newErrors.subject = 'Subject is required';
+    if (!formData.qualification.trim()) newErrors.qualification = 'Qualification is required';
+    if (!formData.experience.trim()) newErrors.experience = 'Experience information is required';
+    if (!formData.salary.trim()) newErrors.salary = 'Salary information is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  // 🔥 BACKEND REQUEST ADDED HERE
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSave(formData);
+
+    if (!validateForm()) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const token = localStorage.getItem("token"); // or whatever key you used
+
+      const res = await axios.post(
+        "http://localhost:5000/api/admin/add-teacher",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+       
+
+      );
+
+       if(res.status===201){
+          alert('Teacher added successfully');
+          navigate('/admin/faculty');
+        }else{
+          alert('Failed to add teacher');
+        }
+
+
+      // Optional: refresh list in parent
+      if (onSave) {
+        onSave(res.data);
+      }
+
+      onClose();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to add teacher');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -90,13 +107,9 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error when user starts typing
+
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -169,9 +182,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                   placeholder="Dr. John Smith"
                 />
                 {errors.name && (
@@ -195,9 +207,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                   placeholder="faculty@university.edu"
                 />
                 {errors.email && (
@@ -221,9 +232,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                   placeholder="+1 (555) 123-4567"
                 />
                 {errors.phone && (
@@ -247,9 +257,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="salary"
                   value={formData.salary}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.salary ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.salary ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                   placeholder="$75,000"
                 />
                 {errors.salary && (
@@ -280,9 +289,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="department"
                   value={formData.department}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.department ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.department ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                 >
                   <option value="">Select Department</option>
                   {departments.map(dept => (
@@ -310,9 +318,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.subject ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.subject ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                   placeholder="Advanced Mathematics"
                 />
                 {errors.subject && (
@@ -335,9 +342,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="qualification"
                   value={formData.qualification}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.qualification ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.qualification ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                 >
                   <option value="">Select Qualification</option>
                   {qualifications.map(qual => (
@@ -365,9 +371,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   name="experience"
                   value={formData.experience}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.experience ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${errors.experience ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                   placeholder="5 years"
                 />
                 {errors.experience && (

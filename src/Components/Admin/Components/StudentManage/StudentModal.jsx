@@ -1,7 +1,10 @@
 // components/StudentModal.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const StudentModal = ({ student, onSave, onClose }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,66 +34,73 @@ const StudentModal = ({ student, onSave, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters long';
-    }
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    else if (formData.name.length < 2) newErrors.name = 'Name must be at least 2 characters';
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = 'Invalid email address';
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
 
-    if (!formData.course.trim()) {
-      newErrors.course = 'Course selection is required';
-    }
+    if (!formData.course.trim()) newErrors.course = 'Course is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  // 🔹 UPDATED: Backend request added here
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSave(formData);
+    if (!validateForm()) return;
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const res = await axios.post(
+        'http://localhost:5000/api/admin/add-student',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      console.log(res.data,"resssssssssss");
+      
+
+      if (res.data.student) {
+        alert('Student added successfully');
+        onSave && onSave(res.data);
+        onClose();
+        navigate('/admin/stdtable');
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || 'Failed to add student');
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when user starts typing
+    setFormData(prev => ({ ...prev, [name]: value }));
+
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const courses = [
-    'Computer Science',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Business Administration',
-    'Psychology',
-    'Medicine',
-    'Law',
-    'Architecture'
+    "Computer Science",
+    "Electrical Engineering",
+    "Mechanical Engineering",
+    "Business Administration",
+    "Psychology",
+    "Medicine",
+    "Law",
+    "Architecture"
   ];
-
   return (
     <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">

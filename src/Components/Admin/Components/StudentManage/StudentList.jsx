@@ -1,17 +1,45 @@
 // components/StudentList.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const StudentList = ({ students, onEdit, onDelete }) => {
+const StudentList = ({ onEdit, onDelete }) => {
+  const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [courseFilter, setCourseFilter] = useState('all');
 
+  // 🔹 FETCH STUDENTS FROM BACKEND
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const res = await axios.get(
+          'http://localhost:5000/api/admin/students',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        setStudents(res.data.students || res.data);
+      } catch (error) {
+        console.error(error);
+        alert(error.response?.data?.message || 'Failed to fetch students');
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
   const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || student.status === statusFilter;
     const matchesCourse = courseFilter === 'all' || student.course === courseFilter;
-    
+
     return matchesSearch && matchesStatus && matchesCourse;
   });
 
@@ -21,7 +49,7 @@ const StudentList = ({ students, onEdit, onDelete }) => {
       inactive: 'bg-red-100 text-red-800 border border-red-200',
       suspended: 'bg-yellow-100 text-yellow-800 border border-yellow-200'
     };
-    
+
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusStyles[status]}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}

@@ -37,7 +37,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Student Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
             <p className="text-sm text-gray-600">Track your progress and achieve your goals</p>
           </div>
         </div>
