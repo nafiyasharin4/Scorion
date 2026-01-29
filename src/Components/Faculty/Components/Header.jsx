@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 function TeacherHeader() {
     const navigate = useNavigate();
     const handleLogout = () => {
-        
+        localStorage.removeItem('teacherToken');
+        localStorage.removeItem('role');
+        localStorage.removeItem('teacherData');
         navigate('/login');
-    }
+    };
   return (
     <div>
       <nav className="bg-slate-800 shadow-lg">
@@ -29,8 +31,8 @@ function TeacherHeader() {
             </div>
 
             {/* Logout Button */}
-            <button onClick={handleLogout} className="px-5 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition">
-              Login
+            <button onClick={handleLogout} className="px-5 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition">
+              Logout
             </button>
           </div>
         </div>

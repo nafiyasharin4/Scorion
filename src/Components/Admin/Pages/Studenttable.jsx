@@ -1,67 +1,34 @@
-// App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StudentList from '../Components/StudentManage/StudentList';
 import StudentModal from '../Components/StudentManage/StudentModal';
 import AdminHeader from '../Components/Header';
+import { Users, UserCheck, UserX, GraduationCap, Plus, Search } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
-// Mock data
-const initialStudents = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    course: 'Computer Science',
-    semester: '3',
-    status: 'active',
-    enrollmentDate: '2023-09-01'
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    phone: '+1 (555) 987-6543',
-    course: 'Electrical Engineering',
-    semester: '2',
-    status: 'active',
-    enrollmentDate: '2024-01-15'
-  },
-  {
-    id: '3',
-    name: 'Mike Johnson',
-    email: 'mike.johnson@example.com',
-    phone: '+1 (555) 456-7890',
-    course: 'Business Administration',
-    semester: '5',
-    status: 'inactive',
-    enrollmentDate: '2022-08-20'
-  },
-  {
-    id: '4',
-    name: 'Sarah Wilson',
-    email: 'sarah.wilson@example.com',
-    phone: '+1 (555) 234-5678',
-    course: 'Psychology',
-    semester: '4',
-    status: 'active',
-    enrollmentDate: '2023-11-10'
-  },
-  {
-    id: '5',
-    name: 'David Brown',
-    email: 'david.brown@example.com',
-    phone: '+1 (555) 345-6789',
-    course: 'Medicine',
-    semester: '6',
-    status: 'suspended',
-    enrollmentDate: '2022-05-15'
-  }
-];
-
-function App() {
-  const [students, setStudents] = useState(initialStudents);
+function StudentGradeTable() {
+  const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get('http://localhost:5000/api/admin/students', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+      });
+      setStudents(res.data.students || []);
+    } catch (err) {
+      toast.error('Failed to fetch students');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddStudent = () => {
     setEditingStudent(null);
@@ -73,145 +40,107 @@ function App() {
     setIsModalOpen(true);
   };
 
-  const handleSaveStudent = (studentData) => {
-    if (editingStudent) {
-      // Update existing student
-      setStudents(students.map(student => 
-        student.id === editingStudent.id 
-          ? { ...studentData, id: editingStudent.id }
-          : student
-      ));
-    } else {
-      // Add new student
-      const newStudent = {
-        ...studentData,
-        id: Date.now().toString()
-      };
-      setStudents([...students, newStudent]);
-    }
-    setIsModalOpen(false);
-    setEditingStudent(null);
-  };
-
-  const handleDeleteStudent = (studentId) => {
-    if (window.confirm('Are you sure you want to delete this student?')) {
-      setStudents(students.filter(student => student.id !== studentId));
+  const handleSaveStudent = async (studentData) => {
+    try {
+      if (editingStudent) {
+        await axios.put(`http://localhost:5000/api/admin/edit-student/${editingStudent._id}`, studentData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+        });
+        toast.success('Student updated');
+      } else {
+        await axios.post('http://localhost:5000/api/admin/add-student', studentData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+        });
+        toast.success('Student added & invitation sent!');
+      }
+      fetchStudents();
+      setIsModalOpen(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Action failed');
     }
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingStudent(null);
+  const handleDeleteStudent = async (studentId) => {
+    if (window.confirm('Delete this student record?')) {
+      try {
+        await axios.delete(`http://localhost:5000/api/admin/delete-student/${studentId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+        });
+        toast.success('Student record removed');
+        fetchStudents();
+      } catch (err) {
+        toast.error('Deletion failed');
+      }
+    }
   };
+
+  const stats = [
+    { label: 'Enrolled Students', value: students.length, icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+    { label: 'Active Learners', value: students.filter(s => !s.isBlocked).length, icon: UserCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+    { label: 'Blocked Access', value: students.filter(s => s.isBlocked).length, icon: UserX, color: 'text-rose-400', bg: 'bg-rose-500/10' },
+    { label: 'Academic Courses', value: [...new Set(students.map(s => s.course))].length, icon: GraduationCap, color: 'text-cyan-400', bg: 'bg-cyan-500/10' }
+  ];
 
   return (
-    <div>
-      <AdminHeader></AdminHeader>
-    <div className="min-h-screen bg-gray-50 mt-5">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">Student Management System</h1>
-              <p className="text-gray-600 mt-2">Manage your student records efficiently</p>
-            </div>
-            <button
-              onClick={handleAddStudent}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center justify-center space-x-2 w-full lg:w-auto"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span>Add Student</span>
-            </button>
+    <div className="min-h-screen bg-slate-900 text-slate-200">
+      <AdminHeader />
+      <main className="container mx-auto px-4 py-8 lg:px-8 max-w-7xl">
+        
+        {/* Header Action */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl font-black text-white tracking-tight mb-2">
+              Student <span className="text-indigo-400">Registry</span>
+            </h1>
+            <p className="text-slate-400 font-medium">Manage academic enrollments and system permissions.</p>
           </div>
+          <button
+            onClick={handleAddStudent}
+            className="flex items-center gap-2 px-6 py-3.5 bg-indigo-500 hover:bg-indigo-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 whitespace-nowrap"
+          >
+            <Plus className="w-5 h-5" />
+            Enroll New Student
+          </button>
         </div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Students</p>
-                <p className="text-2xl font-bold text-gray-900">{students.length}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {students.filter(s => s.status === 'active').length}
-                </p>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {stats.map((stat, i) => (
+            <div key={i} className="bg-slate-800 border border-slate-700/50 p-6 rounded-2xl group transition-all hover:border-slate-600">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+                  <p className="text-3xl font-black text-white group-hover:text-indigo-400 transition-colors">{stat.value}</p>
+                </div>
+                <div className={`${stat.bg} p-3 rounded-xl transition-transform group-hover:scale-110`}>
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Inactive</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {students.filter(s => s.status === 'inactive').length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Suspended</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {students.filter(s => s.status === 'suspended').length}
-                </p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Student List */}
-        <StudentList
-          students={students}
-          onEdit={handleEditStudent}
-          onDelete={handleDeleteStudent}
-        />
+        {/* List Section */}
+        <div className="bg-slate-800 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl">
+          <StudentList
+            students={students}
+            onEdit={handleEditStudent}
+            onDelete={handleDeleteStudent}
+            loading={loading}
+          />
+        </div>
 
         {/* Modal */}
         {isModalOpen && (
           <StudentModal
             student={editingStudent}
             onSave={handleSaveStudent}
-            onClose={handleCloseModal}
+            onClose={() => setIsModalOpen(false)}
           />
         )}
-      </div>
-    </div>
+      </main>
     </div>
   );
 }
 
-export default App;
+export default StudentGradeTable;
