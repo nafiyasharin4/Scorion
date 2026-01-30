@@ -89,37 +89,37 @@ function CreatePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 selection:bg-blue-500/20">
       <div className="w-full max-w-md relative">
         {/* Animated background elements */}
-        <div className="absolute -top-16 -right-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+        <div className="absolute -top-16 -right-16 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden relative backdrop-blur-sm">
+        <div className="bg-white border border-blue-50 rounded-3xl shadow-2xl overflow-hidden relative backdrop-blur-sm">
           {/* Header */}
-          <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 px-8 py-12 text-center relative overflow-hidden">
+          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 px-8 py-10 text-center relative overflow-hidden">
              {/* Decorative pattern */}
              <div className="absolute inset-0 opacity-10 pointer-events-none">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:24px_24px]"></div>
              </div>
             
-            <div className="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl relative z-10">
-              <ShieldCheck className="w-10 h-10 text-white" />
+            <div className="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl relative z-10">
+              <ShieldCheck className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-black text-white mb-2 tracking-tight relative z-10">Protect Your Account</h1>
-            <p className="text-indigo-100 text-sm font-medium opacity-80 relative z-10">Set a secure system access key</p>
+            <h1 className="text-2xl font-black text-white mb-2 tracking-tight relative z-10">Create account</h1>
+            <p className="text-blue-50 text-xs font-semibold opacity-90 relative z-10">Setup your secure system password</p>
           </div>
 
           {/* Form Section */}
-          <div className="px-8 py-10">
-            <form onSubmit={handleSubmit} className="space-y-7">
+          <div className="px-8 py-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Password Input */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">
                   New Password
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-400 text-slate-500">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-600 text-gray-400">
                     <Lock className="h-5 w-5" />
                   </div>
                   <input
@@ -127,15 +127,15 @@ function CreatePasswordPage() {
                     value={password}
                     onChange={handlePasswordChange}
                     disabled={loading}
-                    className={`w-full pl-12 pr-12 py-4 bg-slate-900/50 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white placeholder-slate-600 ${
-                      errors.password ? 'border-red-500/50' : 'border-slate-700 group-hover:border-slate-600'
+                    className={`w-full pl-12 pr-12 py-3.5 bg-gray-50 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-900 placeholder-gray-400 ${
+                      errors.password ? 'border-red-500/50' : 'border-gray-100 group-hover:border-gray-200'
                     }`}
-                    placeholder="Enter system key"
+                    placeholder="Enter new password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -143,16 +143,16 @@ function CreatePasswordPage() {
                 
                 {/* Strength Meter */}
                 {password && (
-                  <div className="mt-4 px-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Security Level</span>
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${
-                        strength <= 1 ? 'text-red-400' : strength <= 3 ? 'text-yellow-400' : 'text-emerald-400'
+                  <div className="mt-3 px-1">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Strength</span>
+                      <span className={`text-[9px] font-black uppercase tracking-widest ${
+                        strength <= 1 ? 'text-red-500' : strength <= 3 ? 'text-yellow-500' : 'text-emerald-500'
                       }`}>
-                        {strength <= 1 ? 'Vulnerable' : strength <= 3 ? 'Functional' : 'Fortified'}
+                        {strength <= 1 ? 'Weak' : strength <= 3 ? 'Moderate' : 'Strong'}
                       </span>
                     </div>
-                    <div className="w-full bg-slate-700/50 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-gray-100 rounded-full h-1 overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${getStrengthColor()}`}
                         style={{ width: `${(strength / 5) * 100}%` }}
@@ -164,11 +164,11 @@ function CreatePasswordPage() {
 
               {/* Confirm Password Input */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-[0.15em] ml-1">
-                  Confirm Key
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">
+                  Confirm Password
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-400 text-slate-500">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-600 text-gray-400">
                     <Lock className="h-5 w-5" />
                   </div>
                   <input
@@ -176,15 +176,15 @@ function CreatePasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={loading}
-                    className={`w-full pl-12 pr-12 py-4 bg-slate-900/50 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white placeholder-slate-600 ${
-                      errors.confirmPassword ? 'border-red-500/50' : 'border-slate-700 group-hover:border-slate-600'
+                    className={`w-full pl-12 pr-12 py-3.5 bg-gray-50 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-900 placeholder-gray-400 ${
+                      errors.confirmPassword ? 'border-red-500/50' : 'border-gray-100 group-hover:border-gray-200'
                     }`}
-                    placeholder="Verify system key"
+                    placeholder="Verify password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -198,8 +198,8 @@ function CreatePasswordPage() {
               </div>
 
               {/* Requirements Checklist */}
-              <div className="bg-slate-900/40 rounded-2xl p-5 border border-slate-700/50">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Security Requirements</p>
+              <div className="bg-blue-50/50 rounded-2xl p-5 border border-blue-100/50">
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Requirements</p>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                   {[
                     { label: '8+ Characters', met: password.length >= 8 },
@@ -209,8 +209,8 @@ function CreatePasswordPage() {
                     { label: 'Special Char', met: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
                     { label: 'Match', met: password && password === confirmPassword }
                   ].map((req, i) => (
-                    <div key={i} className={`flex items-center text-[10px] font-bold transition-opacity ${req.met ? 'text-emerald-400' : 'text-slate-600'}`}>
-                      {req.met ? <CheckCircle2 className="w-3 h-3 mr-2" /> : <div className="w-3 h-3 border-2 border-slate-700 rounded-full mr-2"></div>}
+                    <div key={i} className={`flex items-center text-[9px] font-bold transition-opacity ${req.met ? 'text-emerald-600' : 'text-gray-400'}`}>
+                      {req.met ? <CheckCircle2 className="w-3 h-3 mr-2" /> : <div className="w-3 h-3 border-2 border-gray-200 rounded-full mr-2"></div>}
                       {req.label}
                     </div>
                   ))}

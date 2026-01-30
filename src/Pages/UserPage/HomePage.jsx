@@ -1,71 +1,125 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, TrendingUp, ShieldCheck, Activity } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function GradePredictorHome() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem('role');
-    const dataKey = storedRole === 'teacher' ? 'teacherData' : 'userData';
-    const storedData = localStorage.getItem(dataKey);
-    if (storedData) setUser(JSON.parse(storedData));
+    fetchProfile();
   }, []);
 
-  const handleExplore = () => {
-    navigate('/user1');
+  const fetchProfile = async () => {
+    try {
+      const role = localStorage.getItem('role');
+      const tokenKey = role === 'teacher' ? 'teacherToken' : 'userToken';
+      const token = localStorage.getItem(tokenKey);
+      
+      const endpoint = role === 'teacher' 
+        ? 'http://localhost:5000/api/teacher/profile'
+        : 'http://localhost:5000/api/user/profile';
+      
+      const res = await axios.get(endpoint, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(res.data);
+    } catch (err) {
+      console.error('Home identity sync failed');
+    }
+  };
+
+  const handleDashboard = () => {
+    const role = localStorage.getItem('role');
+    navigate(role === 'teacher' ? '/faculty/dashboard' : '/user1');
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-white text-slate-800 selection:bg-indigo-500/20">
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 text-slate-900">
-        {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-cyan-500/20">
-                  <GraduationCap className="text-white w-10 h-10" />
-                </div>
-              </div>
-              
-              <h1 className="text-5xl font-black text-slate-800 leading-tight tracking-tight">
-                Welcome back, <br />
-                <span className="text-cyan-600 capitalize">{user?.name || 'Explorer'}</span>
-              </h1>
-              
-              <p className="text-xl text-slate-600 leading-relaxed font-medium">
-                Your personalized student platform — <span className="text-slate-900">Learn, Grow, and Connect</span> with confidence.
-              </p>
+      
+      {/* Hero Sector */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 relative">
+        <div className="absolute top-20 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+        <div className="absolute bottom-10 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10 animate-pulse delay-1000"></div>
 
-              <div className="flex flex-wrap gap-4 pt-4">
-                <button onClick={handleExplore} className="px-8 py-4 bg-cyan-600 text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-cyan-700 transition shadow-lg shadow-cyan-500/20 active:scale-95">
-                  Explore Learning
-                </button>
-                <button onClick={() => navigate('/predict')} className="px-8 py-4 bg-white border border-slate-200 text-slate-800 font-black text-xs uppercase tracking-widest rounded-xl hover:bg-slate-50 transition shadow-sm active:scale-95">
-                  Check Grades
-                </button>
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
+          {/* Descriptive Loadout */}
+          <div className="space-y-12">
+            <div className="flex items-center gap-5">
+              <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-200">
+                <GraduationCap className="text-white w-8 h-8" />
               </div>
+              <div className="h-px w-20 bg-slate-200"></div>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-indigo-600 font-black uppercase tracking-[0.4em] text-[10px]">Scorion Predictive Intelligence</p>
+              <h1 className="text-6xl lg:text-7xl font-black text-slate-900 leading-none tracking-tight">
+                Welcome, <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 capitalize">
+                  {user?.name?.split(' ')[0] || 'Member'}
+                </span>
+              </h1>
+            </div>
+            
+            <p className="text-xl text-slate-500 leading-relaxed font-bold max-w-lg">
+              Unlock the power of <span className="text-indigo-600">predictive analytics</span>. Monitor attendance, simulate semester outcomes, and navigate your academic journey with precision.
+            </p>
+
+            <div className="flex flex-wrap gap-5 pt-4">
+              <button 
+                onClick={handleDashboard}
+                className="px-8 py-4 bg-indigo-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 active:scale-95 border-b-4 border-indigo-900"
+              >
+                Access Hub
+              </button>
+              <button 
+                onClick={handleDashboard}
+                className="px-8 py-4 bg-white border-2 border-slate-100 text-slate-600 font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-3 shadow-sm"
+              >
+                <TrendingUp className="w-4 h-4 text-indigo-500" />
+                Analyze Performance
+              </button>
             </div>
 
-            {/* Right Image */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-cyan-500/5 rounded-3xl blur-3xl group-hover:bg-cyan-500/10 transition-colors"></div>
-              <div className="relative bg-white rounded-3xl shadow-2xl p-6 overflow-hidden border border-slate-100 transition-transform group-hover:scale-[1.01]">
-                <img
-                  src="https://img.freepik.com/premium-vector/young-boy-with-glasses-jumping-air-holding-up-paper-with-prominent-grade_995281-850.jpg?semt=ais_hybrid&w=740&q=80"
-                  alt="Success illustration"
-                  className="w-full h-auto rounded-2xl"
-                />
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-2 gap-8 pt-10 border-t border-slate-100">
+               <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <ShieldCheck className="w-3 h-3 text-emerald-500" /> Distributed Ledger
+                  </p>
+                  <p className="text-lg font-black text-slate-800">100% Secure</p>
+               </div>
+               <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <Activity className="w-3 h-3 text-indigo-500" /> Neural Sync
+                  </p>
+                  <p className="text-lg font-black text-slate-800">Real-time Data</p>
+               </div>
+            </div>
+          </div>
+
+          {/* Visual Matrix */}
+          <div className="relative group p-4">
+            <div className="absolute inset-0 bg-indigo-600/5 rounded-[4rem] group-hover:scale-105 transition-transform duration-1000"></div>
+            <div className="relative bg-white rounded-[3rem] shadow-2xl p-6 border border-slate-50 transition-transform duration-700 group-hover:rotate-1 overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-indigo-700"></div>
+               <img
+                src="https://img.freepik.com/premium-vector/young-boy-with-glasses-jumping-air-holding-up-paper-with-prominent-grade_995281-850.jpg?semt=ais_hybrid&w=740&q=80"
+                alt="Intellectual Success"
+                className="w-full h-auto rounded-[2rem] transition-all duration-1000"
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white/95 to-transparent">
+                 <p className="text-xs font-black text-indigo-600 uppercase tracking-[0.3em] mb-1">Academic Projection</p>
+                 <p className="text-2xl font-black text-slate-900">Visualizing Potential.</p>
               </div>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

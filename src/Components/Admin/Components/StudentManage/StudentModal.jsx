@@ -51,8 +51,20 @@ const StudentModal = ({ student, onSave, onClose }) => {
   };
 
   const courses = [
-    'Computer Science', 'Electrical Engineering', 'Mechanical Engineering',
-    'Business Administration', 'Psychology', 'Medicine', 'Law', 'Architecture'
+    'BCA (Bachelor of Computer Applications)', 
+    'B.Sc Computer Science', 
+    'B.Sc Information Technology',
+    'B.Voc Software Development',
+    'B.Voc Data Science',
+    'B.Com Computer Application', 
+    'B.Com Finance',
+    'BBA (Bachelor of Business Administration)',
+    'B.Sc Mathematics',
+    'B.Sc Physics',
+    'B.Sc Chemistry',
+    'B.A. English Language & Literature',
+    'B.A. Economics',
+    'B.A. Sociology'
   ];
 
   return (
@@ -161,14 +173,14 @@ const StudentModal = ({ student, onSave, onClose }) => {
                   onChange={handleChange}
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => <option key={sem} value={sem.toString()}>Term {sem}</option>)}
+                  {[1, 2, 3, 4, 5, 6].map(sem => <option key={sem} value={sem.toString()}>Term {sem}</option>)}
                 </select>
               </div>
             </div>
 
             {/* Enrollment Date */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Enrollment Date</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Admission Date</label>
               <div className="relative group">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
                 <input

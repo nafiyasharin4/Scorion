@@ -19,9 +19,9 @@ export default function ForgotPassword() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/admin/forgot-password', { email });
+      const res = await axios.post('http://localhost:5000/api/user/forgot-password', { email });
       if (res.data.success) {    
-        // ✅ Navigate to OTP page and pass email
+        //  Navigate to OTP page and pass email
         navigate('/forgotcode', { state: { email } });
       } else {
         setError(res.data.message || 'Failed to send OTP');

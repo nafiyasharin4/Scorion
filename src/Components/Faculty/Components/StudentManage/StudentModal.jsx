@@ -22,7 +22,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
         course: student.course || '',
         semester: student.semester || '1',
         status: student.status || 'active',
-        enrollmentDate: student.enrollmentDate || new Date().toISOString().split('T')[0]
+        enrollmentDate: student.enrollmentDate ? student.enrollmentDate.split('T')[0] : new Date().toISOString().split('T')[0]
       });
     }
   }, [student]);
@@ -32,24 +32,16 @@ const StudentModal = ({ student, onSave, onClose }) => {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters long';
     }
 
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.email = 'Invalid email';
     }
 
     if (!formData.course.trim()) {
-      newErrors.course = 'Course selection is required';
+      newErrors.course = 'Course required';
     }
 
     setErrors(newErrors);
@@ -69,191 +61,131 @@ const StudentModal = ({ student, onSave, onClose }) => {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
   };
 
   const courses = [
-    'Computer Science',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Business Administration',
-    'Psychology',
-    'Medicine',
-    'Law',
-    'Architecture'
+    'BCA (Bachelor of Computer Applications)', 
+    'B.Sc Computer Science', 
+    'B.Sc Information Technology',
+    'B.Voc Software Development',
+    'B.Voc Data Science',
+    'B.Com Computer Application', 
+    'B.Com Finance',
+    'BBA (Bachelor of Business Administration)',
+    'B.Sc Mathematics',
+    'B.Sc Physics',
+    'B.Sc Chemistry',
+    'B.A. English Language & Literature',
+    'B.A. Economics',
+    'B.A. Sociology'
   ];
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center p-4 z-[100] bg-slate-950/40">
+      <div className="bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold">
-                {student ? 'Edit Student' : 'Add New Student'}
-              </h2>
-              <p className="text-blue-100 text-sm mt-1">
-                {student ? 'Update student information' : 'Fill in the details to add a new student'}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-blue-100 hover:text-white transition duration-150 p-1 rounded-full hover:bg-blue-500"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+        <div className="px-8 py-6 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">
+              {student ? 'Edit Student File' : 'Initialize Student Record'}
+            </h2>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-1">
+              Registry Oversight Authority
+            </p>
           </div>
+          <button
+            onClick={onClose}
+            className="p-2 bg-slate-950 border border-slate-700 text-slate-500 hover:text-white rounded-xl transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Name */}
-            <div className="md:col-span-2">
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Full Name *
-              </label>
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Identity</label>
               <input
                 type="text"
-                id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Enter student's full name"
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
+                placeholder="Enter Student Name"
               />
-              {errors.name && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.name}</span>
-                </p>
-              )}
+              {errors.name && <p className="text-[10px] text-rose-500 font-black ml-1 uppercase">{errors.name}</p>}
             </div>
 
             {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                Email Address *
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Comms Email</label>
               <input
                 type="email"
-                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="student@example.com"
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
+                placeholder="email@system.com"
               />
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.email}</span>
-                </p>
-              )}
+              {errors.email && <p className="text-[10px] text-rose-500 font-black ml-1 uppercase">{errors.email}</p>}
             </div>
 
             {/* Phone */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                Phone Number *
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Contact Terminal</label>
               <input
                 type="tel"
-                id="phone"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="+1 (555) 123-4567"
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
+                placeholder="+1 (000) 000-0000"
               />
-              {errors.phone && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.phone}</span>
-                </p>
-              )}
             </div>
 
             {/* Course */}
-            <div>
-              <label htmlFor="course" className="block text-sm font-semibold text-gray-700 mb-2">
-                Course *
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Stream</label>
               <select
-                id="course"
                 name="course"
                 value={formData.course}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.course ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
               >
-                <option value="">Select a course</option>
+                <option value="">Select Stream</option>
                 {courses.map(course => (
                   <option key={course} value={course}>{course}</option>
                 ))}
               </select>
-              {errors.course && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.course}</span>
-                </p>
-              )}
             </div>
 
             {/* Semester */}
-            <div>
-              <label htmlFor="semester" className="block text-sm font-semibold text-gray-700 mb-2">
-                Semester
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Current Phase</label>
               <select
-                id="semester"
                 name="semester"
                 value={formData.semester}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
-                  <option key={sem} value={sem.toString()}>Semester {sem}</option>
+                {[1, 2, 3, 4, 5, 6].map(sem => (
+                  <option key={sem} value={sem.toString()}>Phase {sem}</option>
                 ))}
               </select>
             </div>
 
             {/* Status */}
-            <div>
-              <label htmlFor="status" className="block text-sm font-semibold text-gray-700 mb-2">
-                Status
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operational Status</label>
               <select
-                id="status"
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold capitalize"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -262,35 +194,32 @@ const StudentModal = ({ student, onSave, onClose }) => {
             </div>
 
             {/* Enrollment Date */}
-            <div>
-              <label htmlFor="enrollmentDate" className="block text-sm font-semibold text-gray-700 mb-2">
-                Enrollment Date
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Registry Date</label>
               <input
                 type="date"
-                id="enrollmentDate"
                 name="enrollmentDate"
                 value={formData.enrollmentDate}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
               />
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex gap-4 pt-4 border-t border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-150 font-medium"
+              className="flex-1 px-6 py-4 bg-slate-950 border border-slate-800 text-slate-500 hover:text-white font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
             >
-              Cancel
+              Cancel Operation
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-150 font-medium shadow-sm"
+              className="flex-[2] px-6 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95"
             >
-              {student ? 'Update Student' : 'Add Student'}
+              {student ? 'Commit Updates' : 'Authorize Student'}
             </button>
           </div>
         </form>

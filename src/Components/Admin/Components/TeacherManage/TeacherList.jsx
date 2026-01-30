@@ -138,8 +138,8 @@ const TeacherList = ({ teachers, onEdit, onDelete, loading }) => {
                   </td>
                   <td className="px-6 py-6 whitespace-nowrap">
                     <div className="flex flex-col">
-                       <span className="text-sm font-bold text-slate-300">{teacher.experience || 'N/A'}</span>
-                       <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">{teacher.qualification}</span>
+                       <span className="text-sm font-bold text-slate-300">{teacher.teachingExperience || 'N/A'}</span>
+                       <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">{teacher.highestQualification}</span>
                     </div>
                   </td>
                   <td className="px-6 py-6 whitespace-nowrap">

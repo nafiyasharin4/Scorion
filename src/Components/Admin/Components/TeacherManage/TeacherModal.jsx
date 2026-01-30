@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Mail, Phone, BookOpen, GraduationCap, Briefcase, Calendar, DollarSign, ShieldCheck, Loader2 } from 'lucide-react';
+import { X, User, Mail, Phone, BookOpen, GraduationCap, Briefcase, Calendar, IndianRupee, ShieldCheck, Loader2, Clock, ShieldAlert } from 'lucide-react';
 
 const TeacherModal = ({ teacher, onSave, onClose }) => {
   const [formData, setFormData] = useState({
@@ -8,8 +8,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
     phone: '',
     department: '',
     subject: '',
-    qualification: '',
-    experience: '',
+    highestQualification: '',
+    teachingExperience: '',
     joinDate: new Date().toISOString().split('T')[0],
     isBlocked: false,
     salary: ''
@@ -25,11 +25,11 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
         phone: teacher.phone || '',
         department: teacher.department || '',
         subject: teacher.subject || '',
-        qualification: teacher.qualification || '',
-        experience: teacher.experience || '',
+        highestQualification: teacher.highestQualification || '',
+        teachingExperience: teacher.teachingExperience || '',
         joinDate: teacher.joinDate || new Date().toISOString().split('T')[0],
         isBlocked: teacher.isBlocked || false,
-        salary: teacher.salary || ''
+        salary: teacher.salary?.toString() || ''
       });
     }
   }, [teacher]);
@@ -37,17 +37,17 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = 'Full name is required';
-    if (!formData.email.trim()) {
+    if (!String(formData.name || '').trim()) newErrors.name = 'Full name is required';
+    if (!String(formData.email || '').trim()) {
         newErrors.email = 'Email address is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
         newErrors.email = 'Please enter a valid email address';
     }
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    if (!formData.department.trim()) newErrors.department = 'Department is required';
-    if (!formData.subject.trim()) newErrors.subject = 'Subject is required';
-    if (!formData.qualification.trim()) newErrors.qualification = 'Qualification is required';
-    if (!formData.salary.trim()) newErrors.salary = 'Salary is required';
+    if (!String(formData.phone || '').trim()) newErrors.phone = 'Phone number is required';
+    if (!String(formData.department || '').trim()) newErrors.department = 'Department is required';
+    if (!String(formData.subject || '').trim()) newErrors.subject = 'Subject is required';
+    if (!String(formData.highestQualification || '').trim()) newErrors.highestQualification = 'Qualification is required';
+    if (!String(formData.salary || '').trim()) newErrors.salary = 'Salary is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -56,7 +56,12 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onSave(formData);
+      // Clean salary string to Number before saving
+      const cleanSalary = typeof formData.salary === 'string' 
+        ? Number(formData.salary.replace(/[^0-9]/g, '')) 
+        : formData.salary;
+        
+      onSave({ ...formData, salary: cleanSalary });
     }
   };
 
@@ -165,15 +170,15 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
 
             {/* Salary */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Annual Sustenance</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Annual Sustenance (INR)</label>
               <div className="relative group">
-                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
+                <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-cyan-400" />
                 <input
                   type="text"
                   name="salary"
                   value={formData.salary}
                   onChange={handleChange}
-                  placeholder="$80,000"
+                  placeholder="75,000"
                   className={`w-full bg-slate-900 border-2 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none transition-all ${errors.salary ? 'border-rose-500/50 focus:ring-rose-500/10' : 'border-slate-700 focus:ring-cyan-500/10'}`}
                 />
               </div>
@@ -218,8 +223,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
               <div className="relative group">
                 <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
                 <select
-                  name="qualification"
-                  value={formData.qualification}
+                  name="highestQualification"
+                  value={formData.highestQualification}
                   onChange={handleChange}
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-cyan-500 transition-all appearance-none cursor-pointer"
                 >
@@ -236,8 +241,8 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
                 <input
                   type="text"
-                  name="experience"
-                  value={formData.experience}
+                  name="teachingExperience"
+                  value={formData.teachingExperience}
                   onChange={handleChange}
                   placeholder="8 Years"
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
