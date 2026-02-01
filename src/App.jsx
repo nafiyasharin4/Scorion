@@ -1,5 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { SocketProvider } from "./contexts/SocketContext";
 
 import Loginpage from "./Pages/Loginpage";
 import GradePredictionLanding from "./Pages/LandingPage";
@@ -29,38 +31,42 @@ import ProfilePage from "./Pages/UserPage/Profile";
 
 function App() {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<GradePredictionLanding />} />
-      <Route path="/login" element={<Loginpage />} />
-      <Route path="/register" element={<RegisterPage />} />
+    <SocketProvider>
+      <Toaster position="top-right" />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<GradePredictionLanding />} />
+        <Route path="/login" element={<Loginpage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-      <Route path="/user1" element={<StudentProfile />} />
-      <Route path="/home" element={<HomePage />} />
-      <Route path="/courses" element={<CoursesPage />} />
-      <Route path="/community" element={<CommunityPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/notification" element={<ParentAttendanceAlert />} />
-      <Route path="/GPresult" element={<GradePredictionResult />} />
-      <Route path="/DBlogin" element={<DashboardLoginPage />} />
-      <Route path="/forgotpass" element={<ForgotPassword />} />
-      <Route path="/forgotcode" element={<OTPVerification />} />
-      <Route path="/resetpass" element={<ResetPasswordPage />} />
-      <Route path="/createpass/:token" element={<CreatePasswordPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/user1" element={<StudentProfile />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/notification" element={<ParentAttendanceAlert />} />
+        <Route path="/GPresult" element={<GradePredictionResult />} />
+        <Route path="/DBlogin" element={<DashboardLoginPage />} />
+        <Route path="/forgotpass" element={<ForgotPassword />} />
+        <Route path="/forgotcode" element={<OTPVerification />} />
+        <Route path="/resetpass" element={<ResetPasswordPage />} />
+        <Route path="/createpass/:token" element={<CreatePasswordPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
 
-      {/* Admin Routes */}
-      <Route path="/admin/dashboard" element={<Dashboard />} />
-      <Route path="/admin/faculty" element={<FacultyGradePage />} />
-      <Route path="/admin/stdtable" element={<StudentGradeTable />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
+        {/* Admin Routes */}
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/faculty" element={<FacultyGradePage />} />
+        <Route path="/admin/stdtable" element={<StudentGradeTable />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-      {/* Faculty Routes */}
-      <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
-      <Route path="/faculty/students" element={<TeacherStuendtTable />} />
-      <Route path="/faculty/marks" element={<MarkManagePage />} />
-    </Routes>
+        {/* Faculty Routes */}
+        <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
+        <Route path="/faculty/students" element={<TeacherStuendtTable />} />
+        <Route path="/faculty/marks" element={<MarkManagePage />} />
+      </Routes>
+    </SocketProvider>
   );
 }
 
 export default App;
+

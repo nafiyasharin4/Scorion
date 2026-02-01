@@ -7,7 +7,9 @@ import {
   Info,
   Clock,
   Check,
-  Trash2
+  Trash2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -17,6 +19,8 @@ export default function NotificationPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, unread, read
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchNotifications();
@@ -104,6 +108,17 @@ export default function NotificationPage() {
     return true;
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedNotifications = filteredNotifications.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
+
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   if (loading) {
@@ -179,75 +194,121 @@ export default function NotificationPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {filteredNotifications.map((notification) => {
-              const styles = getSeverityStyles(notification.severity);
-              const IconComponent = styles.IconComponent;
-              
-              return (
-                <div
-                  key={notification._id}
-                  onClick={() => !notification.isRead && markAsRead(notification._id)}
-                  className={`${styles.bg} border-2 ${styles.border} rounded-3xl p-6 shadow-lg transition-all cursor-pointer hover:shadow-xl ${
-                    !notification.isRead ? 'ring-2 ring-indigo-500/20' : 'opacity-75'
-                  }`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`${styles.icon} p-3 rounded-2xl flex-shrink-0 shadow-lg`}>
-                      <IconComponent className={`w-6 h-6 ${styles.iconColor}`} />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h3 className={`text-lg font-black ${styles.title} mb-1`}>
-                            {notification.title}
-                          </h3>
-                          {notification.relatedSemester && (
-                            <span className="inline-block px-2 py-0.5 bg-white/60 rounded-full text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2">
-                              Semester {notification.relatedSemester}
-                            </span>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          {!notification.isRead && (
-                            <span className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></span>
-                          )}
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                            {new Date(notification.createdAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric'
-                            })}
-                          </span>
-                        </div>
+          <>
+            <div className="space-y-4">
+              {paginatedNotifications.map((notification) => {
+                const styles = getSeverityStyles(notification.severity);
+                const IconComponent = styles.IconComponent;
+                
+                return (
+                  <div
+                    key={notification._id}
+                    onClick={() => !notification.isRead && markAsRead(notification._id)}
+                    className={`${styles.bg} border-2 ${styles.border} rounded-3xl p-6 shadow-lg transition-all cursor-pointer hover:shadow-xl ${
+                      !notification.isRead ? 'ring-2 ring-indigo-500/20' : 'opacity-75'
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={`${styles.icon} p-3 rounded-2xl flex-shrink-0 shadow-lg`}>
+                        <IconComponent className={`w-6 h-6 ${styles.iconColor}`} />
                       </div>
                       
-                      <p className="text-sm font-medium text-slate-700 leading-relaxed mt-2">
-                        {notification.message}
-                      </p>
-                      
-                      <div className="flex items-center gap-4 mt-4">
-                        <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                          <Clock className="w-3 h-3" />
-                          {new Date(notification.createdAt).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                        {notification.isRead && (
-                          <div className="flex items-center gap-1 text-[9px] font-bold text-emerald-500 uppercase tracking-widest">
-                            <CheckCircle className="w-3 h-3" />
-                            Read
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h3 className={`text-lg font-black ${styles.title} mb-1`}>
+                              {notification.title}
+                            </h3>
+                            {notification.relatedSemester && (
+                              <span className="inline-block px-2 py-0.5 bg-white/60 rounded-full text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2">
+                                Semester {notification.relatedSemester}
+                              </span>
+                            )}
                           </div>
-                        )}
+                          
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {!notification.isRead && (
+                              <span className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></span>
+                            )}
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                              {new Date(notification.createdAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm font-medium text-slate-700 leading-relaxed mt-2">
+                          {notification.message}
+                        </p>
+                        
+                        <div className="flex items-center gap-4 mt-4">
+                          <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                            <Clock className="w-3 h-3" />
+                            {new Date(notification.createdAt).toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                          {notification.isRead && (
+                            <div className="flex items-center gap-1 text-[9px] font-bold text-emerald-500 uppercase tracking-widest">
+                              <CheckCircle className="w-3 h-3" />
+                              Read
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-xl font-black text-sm transition-all ${
+                        currentPage === page
+                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                          : 'bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:border-indigo-200'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
+                
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+
+            {/* Page Info */}
+            {totalPages > 1 && (
+              <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredNotifications.length)} of {filteredNotifications.length}
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

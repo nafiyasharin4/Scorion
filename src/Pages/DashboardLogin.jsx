@@ -38,6 +38,7 @@ export default function DashboardLoginPage() {
         const response = await axios.post('http://localhost:5000/api/teacher/login', { email, password });
         
         if (response.data.token) {
+          // Keep user data but just add teacher data (allows testing in same browser)
           localStorage.setItem('teacherToken', response.data.token);
           localStorage.setItem('role', 'teacher');
           localStorage.setItem('teacherData', JSON.stringify(response.data.teacher));

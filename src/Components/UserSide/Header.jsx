@@ -111,7 +111,7 @@ function Header() {
                             onClick={handleLogout}
                             className="px-6 py-2.5 bg-rose-50 text-rose-600 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-rose-600 hover:text-white transition-all active:scale-95 shadow-sm border border-rose-100"
                         >
-                            Terminate
+                            Logout
                         </button>
                     </div>
 
@@ -120,7 +120,7 @@ function Header() {
                          {user && (
                             <Link to="/profile" className="text-xs font-bold text-indigo-600">{user.name}</Link>
                          )}
-                         <button onClick={handleLogout} className="text-rose-500 text-xs font-bold">EXIT</button>
+                         <button onClick={handleLogout} className="text-rose-500 text-xs font-bold">Logout</button>
                     </div>
                 </div>
             </div>

@@ -119,10 +119,7 @@ export default function Profile() {
             {/* Hub Actions */}
             <div className="bg-white border border-slate-100 rounded-[3rem] p-8 space-y-3 shadow-xl shadow-indigo-500/5">
                <button className="w-full flex items-center justify-between p-5 hover:bg-slate-50 rounded-[2rem] transition-all group border border-transparent hover:border-slate-100">
-                  <div className="flex items-center gap-4">
-                     <Settings className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-                     <span className="text-sm font-black text-slate-500 group-hover:text-slate-900 uppercase tracking-widest">Configuration</span>
-                  </div>
+               
                   <ChevronRight className="w-4 h-4 text-slate-300" />
                </button>
                <button 
@@ -134,7 +131,7 @@ export default function Profile() {
                >
                   <div className="flex items-center gap-4">
                      <LogOut className="w-5 h-5 text-rose-500" />
-                     <span className="text-sm font-black text-rose-600 uppercase tracking-widest">Terminate Session</span>
+                     <span className="text-sm font-black text-rose-600 uppercase tracking-widest">Log out</span>
                   </div>
                </button>
             </div>

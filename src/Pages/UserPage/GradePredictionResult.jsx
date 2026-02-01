@@ -214,28 +214,28 @@ const GradePredictionResult = () => {
 
           <div className="lg:col-span-12 xl:col-span-5 bg-white border border-slate-100 rounded-[3.5rem] p-12 shadow-2xl shadow-indigo-500/5 relative overflow-hidden flex flex-col">
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50"></div>
-            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-auto relative z-10">Visual Grade Distribution</h2>
-            <div className="h-[400px] flex items-end justify-around gap-8 pt-20 relative z-10 pb-10">
-              {selectedSemesterData.subjects.map((subject, index) => {
+            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-4 relative z-10">Visual Grade Distribution</h2>
+            <div className="h-[350px] flex items-end justify-start gap-4 pt-16 relative z-10 pb-8 overflow-x-auto">
+              {selectedSemesterData.subjects && selectedSemesterData.subjects.map((subject, index) => {
                 const points = {'A+':10, 'A':9, 'B':8, 'C':7, 'D':6, 'F':3}[subject.grade] || 0;
                 return (
-                  <div key={index} className="flex-1 flex flex-col items-center gap-6 h-full group">
+                  <div key={index} className="flex-shrink-0 flex flex-col items-center gap-4 h-full group" style={{ minWidth: '60px', maxWidth: '80px' }}>
                     <div className="w-full flex-1 flex flex-col justify-end">
                       <div 
-                        className="w-full rounded-2xl transition-all duration-700 relative cursor-pointer"
+                        className="w-full rounded-xl transition-all duration-700 relative cursor-pointer"
                         style={{ 
-                          height: `${points * 10}%`,
+                          height: `${Math.max(points * 10, 10)}%`,
                           backgroundColor: barColors[index % barColors.length],
                           boxShadow: `0 10px 30px -5px ${barColors[index % barColors.length]}40`
                         }}
                       >
-                        <div className="absolute -top-14 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-2xl text-[10px] font-black opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-2xl whitespace-nowrap">
-                          {subject.grade} • {subject.marks} M
+                        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-3 py-1.5 rounded-xl text-[9px] font-black opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-2xl whitespace-nowrap z-20">
+                          {subject.grade} • {subject.marks}
                         </div>
                       </div>
                     </div>
-                    <div className="h-12 flex items-center justify-center">
-                       <p className="text-[11px] font-black text-slate-400 uppercase tracking-tighter text-center line-clamp-2 transform -rotate-15">{subject.name}</p>
+                    <div className="h-10 flex items-center justify-center">
+                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter text-center line-clamp-2" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{subject.name?.substring(0, 12)}</p>
                     </div>
                   </div>
                 );
@@ -244,7 +244,7 @@ const GradePredictionResult = () => {
             <div className="bg-indigo-50 p-6 rounded-[2.5rem] mt-auto border border-indigo-100">
                <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">Recommendation Protocol</p>
                <p className="text-xs font-bold text-slate-600 leading-relaxed">
-                  Continue maintaining <span className="text-indigo-700 font-black">Velocity α</span> in core subjects to ensure your terminal projection remains superior.
+                 Continue maintaining <span className="text-indigo-700 font-black">Velocity α</span> in core subjects to ensure your terminal projection remains superior.
                </p>
             </div>
           </div>

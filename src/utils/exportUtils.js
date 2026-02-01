@@ -42,7 +42,8 @@ export const exportToPDF = (studentInfo, semesterData) => {
 
   // Results Table
   const tableColumn = ["#", "Subject Name", "Marks", "Grade", "Status"];
-  const tableRows = semesterData.subjects.map((sub, index) => [
+  const subjects = semesterData?.subjects || [];
+  const tableRows = subjects.map((sub, index) => [
     index + 1,
     sub.name,
     sub.marks || 0,
@@ -102,7 +103,7 @@ export const exportToExcel = (studentInfo, semesterData) => {
     [],
     ["ACADEMIC PERFORMANCE"],
     ["#", "Subject Name", "Marks", "Grade", "Status"],
-    ...semesterData.subjects.map((sub, index) => [
+    ...(semesterData?.subjects || []).map((sub, index) => [
       index + 1,
       sub.name,
       sub.marks || 0,

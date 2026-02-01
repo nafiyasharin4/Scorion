@@ -115,12 +115,20 @@ function MarkManagePage() {
 
     if (window.confirm(`Permanently purge Semester ${semester} records for ${student.name}?`)) {
       try {
-        await axios.delete(`http://localhost:5000/api/teacher/delete-mark/${markRecord._id}`);
+        const token = localStorage.getItem('teacherToken');
+        if (!token) {
+          toast.error('Session expired. Please login again.');
+          return;
+        }
+        
+        await axios.delete(`http://localhost:5000/api/teacher/delete-mark/${markRecord._id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         toast.success(`Semester ${semester} registry purged`);
         await fetchData();
       } catch (error) {
         console.error('Purge failure:', error);
-        toast.error('Failed to purge academic record');
+        toast.error(error.response?.data?.message || 'Failed to purge academic record');
       }
     }
   };

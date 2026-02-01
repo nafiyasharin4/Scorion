@@ -57,7 +57,7 @@ function TeacherHeader() {
             onClick={handleLogout} 
             className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all active:scale-95"
           >
-            Terminal Shutdown
+            Logout
           </button>
         </div>
       </div>

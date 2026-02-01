@@ -13,11 +13,13 @@ export const SocketProvider = ({ children }) => {
   const connectSocket = useCallback(() => {
     const token = localStorage.getItem('userToken');
     const userData = localStorage.getItem('userData');
+    const role = localStorage.getItem('role');
     
-    console.log('Socket connect attempt - token:', !!token, 'userData:', !!userData);
+    console.log('Socket connect attempt - token:', !!token, 'userData:', !!userData, 'role:', role);
     
-    if (!token || !userData) {
-      console.log('No token or userData, skipping socket connection');
+    // Only connect socket for students (users), not faculty or admin
+    if (!token || !userData || role !== 'user') {
+      console.log('Not a student user, skipping socket connection');
       return null;
     }
 
@@ -124,8 +126,19 @@ export const SocketProvider = ({ children }) => {
     // Also check periodically if user is logged in but socket not connected
     const checkConnection = setInterval(() => {
       const token = localStorage.getItem('userToken');
-      if (token && !socket?.connected) {
-        console.log('Token exists but socket not connected, attempting reconnect...');
+      const role = localStorage.getItem('role');
+      
+      // Disconnect if role changed to non-user
+      if (socket?.connected && role !== 'user') {
+        console.log('Role changed to non-user, disconnecting socket...');
+        socket.disconnect();
+        setSocket(null);
+        setIsConnected(false);
+        return;
+      }
+      
+      if (token && role === 'user' && !socket?.connected) {
+        console.log('Student token exists but socket not connected, attempting reconnect...');
         const sock = connectSocket();
         if (sock) setSocket(sock);
       }
