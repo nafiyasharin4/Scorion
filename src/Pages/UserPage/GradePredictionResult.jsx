@@ -1,304 +1,255 @@
-import React, { useState } from 'react';
-import { Download, ArrowLeft, Award, CheckCircle, XCircle, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, ArrowLeft, Award, CheckCircle, XCircle, TrendingUp, Activity, ShieldCheck } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
+import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+import { ChevronDown, FileText, Table } from 'lucide-react';
 
 const GradePredictionResult = () => {
-  // Sample prediction data
-  const [predictionData] = useState({
-    studentName: 'Aarav Kumar',
-    subjects: [
-      { name: 'Maths', marks: 85, maxMarks: 100 },
-      { name: 'Science', marks: 78, maxMarks: 100 },
-      { name: 'English', marks: 92, maxMarks: 100 },
-      { name: 'Computer', marks: 88, maxMarks: 100 }
-    ]
-  });
+  const location = useLocation();
   const navigate = useNavigate();
+  const [selectedSemesterData, setSelectedSemesterData] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [showExportOptions, setShowExportOptions] = useState(false);
+
+  useEffect(() => {
+    // Priority 1: Use explicitly selected semester data passed from UserPage
+    if (location.state?.selectedSemesterData) {
+      setSelectedSemesterData(location.state.selectedSemesterData);
+      setProfile(location.state.profile);
+    } 
+    // Priority 2: Fallback to marks array (default to latest only if no selection was made)
+    else if (location.state?.marks && location.state.marks.length > 0) {
+      setSelectedSemesterData(location.state.marks[location.state.marks.length - 1]);
+      setProfile(location.state.profile);
+    } 
+    // Priority 3: No data available, redirect back
+    else {
+      navigate('/user1');
+    }
+  }, [location.state, navigate]);
+
   const handlePredictAgain = () => {
     navigate('/user1');
-  }
-
-  // Grade calculation function
-  const calculateGrade = (marks) => {
-    if (marks >= 90) return { grade: 'A+', status: 'Excellent', color: 'text-green-600', bgColor: 'bg-green-100', borderColor: 'border-green-500' };
-    if (marks >= 80) return { grade: 'A', status: 'Very Good', color: 'text-blue-600', bgColor: 'bg-blue-100', borderColor: 'border-blue-500' };
-    if (marks >= 70) return { grade: 'B+', status: 'Good', color: 'text-indigo-600', bgColor: 'bg-indigo-100', borderColor: 'border-indigo-500' };
-    if (marks >= 60) return { grade: 'B', status: 'Average', color: 'text-purple-600', bgColor: 'bg-purple-100', borderColor: 'border-purple-500' };
-    if (marks >= 50) return { grade: 'C', status: 'Pass', color: 'text-yellow-600', bgColor: 'bg-yellow-100', borderColor: 'border-yellow-500' };
-    return { grade: 'F', status: 'Fail', color: 'text-red-600', bgColor: 'bg-red-100', borderColor: 'border-red-500' };
   };
 
-  // Calculate overall statistics
-  const totalMarks = predictionData.subjects.reduce((sum, subject) => sum + subject.marks, 0);
-  const maxTotalMarks = predictionData.subjects.reduce((sum, subject) => sum + subject.maxMarks, 0);
-  const percentage = ((totalMarks / maxTotalMarks) * 100).toFixed(2);
-  const overallGrade = calculateGrade(parseFloat(percentage));
-
-  // Download PDF function (dummy)
-  const handleDownloadPDF = () => {
-    alert('PDF Download feature would be implemented here. Currently using browser print dialog.');
-    window.print();
+  const getGradeDetails = (grade) => {
+    const details = {
+      'A+': { status: 'Exceptional', color: 'text-indigo-600', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-100' },
+      'A': { status: 'Superior', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100' },
+      'B': { status: 'Above Average', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100' },
+      'C': { status: 'Average', color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100' },
+      'D': { status: 'Pass', color: 'text-slate-600', bgColor: 'bg-slate-50', borderColor: 'border-slate-100' },
+      'F': { status: 'Incomplete', color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-100' }
+    };
+    return details[grade] || { status: 'Pending', color: 'text-slate-400', bgColor: 'bg-slate-50', borderColor: 'border-slate-100' };
   };
 
- 
+  const handleExportPDF = () => {
+    exportToPDF(profile, selectedSemesterData);
+    setShowExportOptions(false);
+  };
 
-  // Bar colors for chart
-  const barColors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'];
+  const handleExportExcel = () => {
+    exportToExcel(profile, selectedSemesterData);
+    setShowExportOptions(false);
+  };
+
+  const barColors = ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b', '#6366f1'];
+
+  if (!selectedSemesterData) return null;
+
+  const overallDetails = getGradeDetails(selectedSemesterData.totalGrade);
+  const percentage = (selectedSemesterData.sgpa * 10).toFixed(1);
 
   return (
-    <div>
-      <Header></Header>
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Grade Prediction Results</h1>
-              <p className="text-gray-600 flex items-center gap-2">
-                <Award className="text-blue-600" size={20} />
-                Academic Performance Analysis
-              </p>
-            </div>
-            <div className="flex gap-3">
+    <div className="min-h-screen bg-slate-50 text-slate-800 selection:bg-indigo-500/20">
+      <Header />
+      <div className="max-w-7xl mx-auto py-10 lg:py-16 px-4 sm:px-6 lg:px-8 space-y-10">
+        
+        {/* Core Identity Hub */}
+        <div className="bg-white border border-slate-100 rounded-[3.5rem] p-10 shadow-2xl shadow-indigo-500/5 relative overflow-hidden text-slate-800">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-700"></div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8 relative z-10 font-black">
+             <div>
+               <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center border border-indigo-100">
+                     <Activity className="text-indigo-600 w-7 h-7" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">Academic <span className="text-indigo-600">Intelligence</span></h1>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="px-4 py-1.5 bg-indigo-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/30">
+                        Semester {selectedSemesterData.semester}
+                      </span>
+                      <ShieldCheck className="text-emerald-500 w-4 h-4" />
+                      <span className="text-slate-400 font-black uppercase tracking-[0.3em] text-[9px]">Prediction Registry</span>
+                    </div>
+                  </div>
+               </div>
+             </div>
+            <div className="flex gap-4 relative">
               <button
                 onClick={handlePredictAgain}
-                className="flex items-center gap-2 bg-gray-100 text-gray-700 px-5 py-3 rounded-lg hover:bg-gray-200 transition-all font-semibold shadow-md"
+                className="px-8 py-4 bg-slate-50 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-2xl border border-slate-100 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center gap-3 shadow-sm"
               >
-                <ArrowLeft size={20} />
-                Predict Again
+                <ArrowLeft size={16} />
+                Return to Hub
               </button>
-              <button
-                onClick={handleDownloadPDF}
-                className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-md"
-              >
-                <Download size={20} />
-                Download PDF
-              </button>
+              
+              <div className="relative">
+                <button
+                  onClick={() => setShowExportOptions(!showExportOptions)}
+                  className="px-8 py-4 bg-indigo-600 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all flex items-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 border-b-4 border-indigo-900"
+                >
+                  <Download size={16} />
+                  Export Registry
+                  <ChevronDown size={14} className={`transition-transform ${showExportOptions ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showExportOptions && (
+                  <div className="absolute top-full right-0 mt-3 w-56 bg-white border border-slate-100 rounded-[1.5rem] shadow-2xl p-2 z-[100] animate-in fade-in slide-in-from-top-2 duration-300">
+                    <button 
+                      onClick={handleExportPDF}
+                      className="w-full flex items-center gap-3 p-4 hover:bg-slate-50 rounded-xl transition-all group"
+                    >
+                      <div className="w-10 h-10 bg-rose-50 rounded-lg flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
+                        <FileText size={20} />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[10px] font-black text-slate-900 uppercase">PDF Matrix</p>
+                        <p className="text-[9px] font-bold text-slate-400">Formal Report</p>
+                      </div>
+                    </button>
+
+                    <button 
+                      onClick={handleExportExcel}
+                      className="w-full flex items-center gap-3 p-4 hover:bg-slate-50 rounded-xl transition-all group"
+                    >
+                      <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+                        <Table size={20} />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[10px] font-black text-slate-900 uppercase">Excel Ledger</p>
+                        <p className="text-[9px] font-bold text-slate-400">Data Analytics</p>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Student Info & Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {/* Student Name */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Student Name</h3>
-            <p className="text-2xl font-bold text-gray-800">{predictionData.studentName}</p>
+        {/* Primary Analytical Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="bg-white border border-slate-100 rounded-[3rem] p-10 shadow-xl shadow-indigo-500/5 hover:border-indigo-200 transition-all group">
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Final Prediction SGPA</h3>
+            <p className="text-6xl font-black text-slate-900 transition-transform group-hover:scale-110">{selectedSemesterData.sgpa}</p>
           </div>
 
-          {/* Overall Percentage */}
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
-            <h3 className="text-sm font-semibold opacity-90 uppercase mb-2">Overall Percentage</h3>
-            <div className="flex items-center justify-between">
-              <p className="text-4xl font-bold">{percentage}%</p>
-              <TrendingUp size={40} className="opacity-80" />
+          <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-indigo-500/30 group">
+            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <h3 className="text-[10px] font-black opacity-60 uppercase tracking-widest mb-4 relative z-10">Neural Stability Score</h3>
+            <div className="flex items-center justify-between relative z-10">
+              <p className="text-6xl font-black">{percentage}%</p>
+              <TrendingUp size={48} className="opacity-20 translate-x-4 transition-transform group-hover:translate-x-0" />
             </div>
           </div>
 
-          {/* Overall Grade */}
-          <div className={`bg-white rounded-2xl shadow-lg p-6 border-l-4 ${overallGrade.borderColor}`}>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Overall Grade</h3>
+          <div className="bg-white border border-slate-100 rounded-[3rem] p-10 shadow-xl shadow-indigo-500/5 flex flex-col justify-between hover:border-blue-200 transition-all">
+             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Attendance Clearance</h3>
+             <div className="flex items-center justify-between">
+                <p className="text-6xl font-black text-slate-900">{selectedSemesterData.attendancePercentage || '0'}%</p>
+                <div className="w-12 h-12 rounded-2xl border-4 border-slate-50 border-t-indigo-600 animate-spin"></div>
+             </div>
+          </div>
+
+          <div className={`bg-white border border-slate-100 rounded-[3rem] p-10 shadow-xl shadow-indigo-500/5 flex flex-col justify-between border-t-8 ${overallDetails.borderColor}`}>
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Predicted Grade</h3>
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-4xl font-bold ${overallGrade.color}`}>{overallGrade.grade}</p>
-                <p className={`text-sm font-semibold mt-1 ${overallGrade.color}`}>{overallGrade.status}</p>
+                <p className={`text-6xl font-black ${overallDetails.color}`}>{selectedSemesterData.totalGrade}</p>
+                <p className={`text-[10px] font-black uppercase tracking-widest mt-3 ${overallDetails.color}`}>{overallDetails.status}</p>
               </div>
-              {parseFloat(percentage) >= 50 ? (
-                <CheckCircle size={40} className="text-green-500" />
+              {selectedSemesterData.totalGrade !== 'F' ? (
+                <CheckCircle size={48} className="text-emerald-500 opacity-20" />
               ) : (
-                <XCircle size={40} className="text-red-500" />
+                <XCircle size={48} className="text-rose-500 opacity-20" />
               )}
             </div>
           </div>
         </div>
 
-        {/* Marks Table */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Subject-wise Predicted Marks</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-blue-50">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Subject</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Predicted Marks</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Maximum Marks</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Percentage</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Grade</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {predictionData.subjects.map((subject, index) => {
-                  const subjectPercentage = ((subject.marks / subject.maxMarks) * 100).toFixed(2);
-                  const subjectGrade = calculateGrade(parseFloat(subjectPercentage));
-                  return (
-                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-4 font-semibold text-gray-800">{subject.name}</td>
-                      <td className="text-center py-4 px-4 font-bold text-blue-600">{subject.marks}</td>
-                      <td className="text-center py-4 px-4 text-gray-600">{subject.maxMarks}</td>
-                      <td className="text-center py-4 px-4 font-semibold text-gray-700">{subjectPercentage}%</td>
-                      <td className="text-center py-4 px-4">
-                        <span className={`inline-block px-3 py-1 rounded-full font-bold ${subjectGrade.bgColor} ${subjectGrade.color}`}>
-                          {subjectGrade.grade}
-                        </span>
-                      </td>
-                      <td className="text-center py-4 px-4">
-                        {subject.marks >= 50 ? (
-                          <span className="inline-flex items-center gap-1 text-green-600 font-semibold">
-                            <CheckCircle size={18} />
-                            Pass
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-red-600 font-semibold">
-                            <XCircle size={18} />
-                            Fail
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr className="bg-gray-50 font-bold">
-                  <td className="py-4 px-4 text-gray-800">Total</td>
-                  <td className="text-center py-4 px-4 text-blue-600 text-lg">{totalMarks}</td>
-                  <td className="text-center py-4 px-4 text-gray-600">{maxTotalMarks}</td>
-                  <td className="text-center py-4 px-4 text-gray-800 text-lg">{percentage}%</td>
-                  <td className="text-center py-4 px-4">
-                    <span className={`inline-block px-3 py-1 rounded-full font-bold ${overallGrade.bgColor} ${overallGrade.color}`}>
-                      {overallGrade.grade}
-                    </span>
-                  </td>
-                  <td className="text-center py-4 px-4">
-                    {parseFloat(percentage) >= 50 ? (
-                      <span className="inline-flex items-center gap-1 text-green-600 font-semibold">
-                        <CheckCircle size={18} />
-                        Pass
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-red-600 font-semibold">
-                        <XCircle size={18} />
-                        Fail
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-
-        {/* Custom Bar Graph */}
-        <div className="bg-white rounded-2xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance Graph</h2>
-          
-          {/* Graph Container */}
-          <div className="relative" style={{ height: '400px' }}>
-            {/* Y-axis labels */}
-            <div className="absolute left-0 top-0 bottom-12 flex flex-col justify-between text-sm text-gray-600 font-medium pr-2">
-              <span>100</span>
-              <span>80</span>
-              <span>60</span>
-              <span>40</span>
-              <span>20</span>
-              <span>0</span>
+        {/* Structural Breakdown */}
+        <div className="grid lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-12 xl:col-span-7 bg-white border border-slate-100 rounded-[3.5rem] p-12 shadow-2xl shadow-indigo-500/5 overflow-hidden">
+            <div className="flex items-center justify-between mb-12">
+               <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Analytical Partition</h2>
+               <div className="h-px flex-1 mx-8 bg-slate-100 hidden sm:block"></div>
+               <Award className="text-indigo-200 w-10 h-10" />
             </div>
-            
-            {/* Grid lines */}
-            <div className="absolute left-12 right-0 top-0 bottom-12 flex flex-col justify-between">
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="border-t border-gray-200 w-full"></div>
-              ))}
-            </div>
-            
-            {/* Bars */}
-            <div className="absolute left-12 right-0 top-0 bottom-12 flex items-end justify-around gap-4 px-4">
-              {predictionData.subjects.map((subject, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center h-full justify-end">
-                  {/* Bar */}
-                  <div className="relative w-full flex justify-center items-end" style={{ height: '100%' }}>
-                    <div 
-                      className="w-full max-w-24 rounded-t-lg transition-all duration-1000 ease-out relative group cursor-pointer hover:opacity-80"
-                      style={{ 
-                        height: `${subject.marks}%`,
-                        backgroundColor: barColors[index % barColors.length]
-                      }}
-                    >
-                      {/* Value on top of bar */}
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                        {subject.marks} marks
+            <div className="grid sm:grid-cols-2 gap-6">
+              {selectedSemesterData.subjects.map((subject, index) => {
+                const details = getGradeDetails(subject.grade);
+                return (
+                  <div key={index} className="flex flex-col p-8 bg-slate-50 border border-slate-100 rounded-[2.5rem] group hover:bg-white hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all">
+                    <div className="flex items-start justify-between mb-6">
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner ${details.bgColor} ${details.color} border ${details.borderColor}`}>
+                        {subject.grade}
                       </div>
-                      <div className="absolute top-2 left-0 right-0 text-center text-white font-bold text-sm">
-                        {subject.marks}
+                      <div className="text-right">
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weighting</p>
+                         <p className="text-sm font-black text-slate-900">{subject.marks || 0} / 100</p>
                       </div>
                     </div>
+                    <p className="text-base font-black text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors">{subject.name}</p>
+                    <p className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-widest">{details.status}</p>
                   </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* X-axis labels */}
-            <div className="absolute left-12 right-0 bottom-0 flex justify-around gap-4 px-4 pt-2">
-              {predictionData.subjects.map((subject, index) => (
-                <div key={index} className="flex-1 text-center">
-                  <div className="text-sm font-semibold text-gray-700">{subject.name}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
-          
-          {/* Chart Legend */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="flex flex-wrap gap-4 justify-center">
-              {predictionData.subjects.map((subject, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div 
-                    className="w-4 h-4 rounded"
-                    style={{ backgroundColor: barColors[index % barColors.length] }}
-                  ></div>
-                  <span className="text-sm text-gray-600 font-medium">{subject.name}: {subject.marks} marks</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
-        {/* Summary Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Summary</h2>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${parseFloat(percentage) >= 50 ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <p className="text-gray-700">
-                <span className="font-semibold">Overall Result:</span> {parseFloat(percentage) >= 50 ? 'PASS' : 'FAIL'}
-              </p>
+          <div className="lg:col-span-12 xl:col-span-5 bg-white border border-slate-100 rounded-[3.5rem] p-12 shadow-2xl shadow-indigo-500/5 relative overflow-hidden flex flex-col">
+            <div className="absolute -top-10 -right-10 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50"></div>
+            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-auto relative z-10">Visual Grade Distribution</h2>
+            <div className="h-[400px] flex items-end justify-around gap-8 pt-20 relative z-10 pb-10">
+              {selectedSemesterData.subjects.map((subject, index) => {
+                const points = {'A+':10, 'A':9, 'B':8, 'C':7, 'D':6, 'F':3}[subject.grade] || 0;
+                return (
+                  <div key={index} className="flex-1 flex flex-col items-center gap-6 h-full group">
+                    <div className="w-full flex-1 flex flex-col justify-end">
+                      <div 
+                        className="w-full rounded-2xl transition-all duration-700 relative cursor-pointer"
+                        style={{ 
+                          height: `${points * 10}%`,
+                          backgroundColor: barColors[index % barColors.length],
+                          boxShadow: `0 10px 30px -5px ${barColors[index % barColors.length]}40`
+                        }}
+                      >
+                        <div className="absolute -top-14 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-2xl text-[10px] font-black opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-2xl whitespace-nowrap">
+                          {subject.grade} • {subject.marks} M
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-12 flex items-center justify-center">
+                       <p className="text-[11px] font-black text-slate-400 uppercase tracking-tighter text-center line-clamp-2 transform -rotate-15">{subject.name}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-              <p className="text-gray-700">
-                <span className="font-semibold">Total Marks:</span> {totalMarks} out of {maxTotalMarks}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-              <p className="text-gray-700">
-                <span className="font-semibold">Performance Grade:</span> {overallGrade.grade} - {overallGrade.status}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
-              <p className="text-gray-700">
-                <span className="font-semibold">Subjects Passed:</span> {predictionData.subjects.filter(s => s.marks >= 50).length} out of {predictionData.subjects.length}
-              </p>
+            <div className="bg-indigo-50 p-6 rounded-[2.5rem] mt-auto border border-indigo-100">
+               <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">Recommendation Protocol</p>
+               <p className="text-xs font-bold text-slate-600 leading-relaxed">
+                  Continue maintaining <span className="text-indigo-700 font-black">Velocity α</span> in core subjects to ensure your terminal projection remains superior.
+               </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };

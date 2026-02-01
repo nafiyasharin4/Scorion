@@ -69,13 +69,15 @@ export default function OTPVerification() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/verify-otp", {
+      const res = await axios.post("http://localhost:5000/api/user/forgot-password/verify-otp", {
         email,
         otp: code
       });
+      console.log(res.data,"kkk");
+      
 
       if (res.data.success) {
-        navigate('/resetpass');
+        navigate('/resetpass', { state: { email } });
       } else {
         setError("Invalid OTP");
       }
@@ -86,24 +88,33 @@ export default function OTPVerification() {
     setIsLoading(false);
   };
 
-  const handleResendOTP = () => {
+  const handleResendOTP = async () => {
     if (countdown > 0) return;
 
     setIsLoading(true);
     setError('');
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setCountdown(60);
-      setOtp(['', '', '', '', '', '']);
-      otpRefs[0].current?.focus();
+    try {
+      const res = await axios.post('http://localhost:5000/api/user/forgot-password', { email });
+      if (res.data.success) {
+        setIsLoading(false);
+        setCountdown(60);
+        setOtp(['', '', '', '', '', '']);
+        otpRefs[0].current?.focus();
 
-      const successMsg = document.getElementById('resend-success');
-      if (successMsg) {
-        successMsg.classList.remove('hidden');
-        setTimeout(() => successMsg.classList.add('hidden'), 3000);
+        const successMsg = document.getElementById('resend-success');
+        if (successMsg) {
+          successMsg.classList.remove('hidden');
+          setTimeout(() => successMsg.classList.add('hidden'), 3000);
+        }
+      } else {
+        setError(res.data.message || 'Failed to resend OTP');
       }
-    }, 1000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBackToEmail = () => {

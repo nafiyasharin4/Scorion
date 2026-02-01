@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Lock, ArrowLeft, CheckCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export default function ResetPasswordPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email || '';
+  
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -19,9 +26,14 @@ export default function ResetPasswordPage() {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
+
+    if (!email) {
+      toast.error('Email is missing. Please start again.');
+      return;
+    }
 
     const passwordErrors = validatePassword(newPassword);
     if (passwordErrors.length > 0) {
@@ -40,11 +52,23 @@ export default function ResetPasswordPage() {
     setErrors({});
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/user/reset-password', {
+        email,
+        newPassword
+      });
+
+      if (res.data.success) {
+        setIsSuccess(true);
+        toast.success('Password reset successful!');
+      } else {
+        toast.error(res.data.message || 'Failed to reset password');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Something went wrong');
+    } finally {
       setIsLoading(false);
-      setIsSuccess(true);
-    }, 1500);
+    }
   };
 
   if (isSuccess) {
@@ -89,7 +113,7 @@ export default function ResetPasswordPage() {
 
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* New Password Field */}
             <div>
               <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
@@ -184,7 +208,7 @@ export default function ResetPasswordPage() {
                 'Reset Password'
               )}
             </button>
-          </div>
+          </form>
 
           {/* Back to Login */}
           <div className="mt-6 text-center">

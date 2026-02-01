@@ -1,28 +1,33 @@
-import { useState, React } from 'react';
-import { User, Mail, Phone, Lock, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
+import { User, Mail, Phone, Lock, Loader2, ShieldCheck } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-
 import axios from 'axios';
-
+import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
-
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
-        password: ''
+        password: '',
+        termsAccepted: false
     });
     const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-        setErrors({ ...errors, [e.target.name]: '' });
+        const { name, value, type, checked } = e.target;
+        setFormData({ 
+            ...formData, 
+            [name]: type === 'checkbox' ? checked : value 
+        });
+        setErrors({ ...errors, [name]: '' });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        
         const newErrors = {};
 
         if (!formData.name.trim()) newErrors.name = 'Name is required';
@@ -41,141 +46,153 @@ export default function RegisterPage() {
         } else if (formData.password.length < 8) {
             newErrors.password = 'Password must be at least 8 characters';
         }
+        if (!formData.termsAccepted) {
+            toast.error('Please accept the Terms and Conditions');
+            return;
+        }
 
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
-            axios.post("http://localhost:5000/api/admin/register", formData)
-                .then((res) => {
-                    console.log("Registration success:", res.data);
-                    if (res.data.success) {
-                        navigate("/forgotcode", {
-                            state: { email: formData.email }
-                        });
-                    }
-
-
-                })
-                .catch((err) => {
-                    console.error("Registration error:", err.response?.data || err);
-                    alert(err.response?.data?.message || "Something went wrong!");
+            setLoading(true);
+            try {
+                // Changed from admin/register to user/register
+                const response = await axios.post("http://localhost:5000/api/user/register", {
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    password: formData.password
                 });
+
+                toast.success('Registration successful! Please verify your email.');
+                // Backend usually sends OTP to email
+                navigate("/forgotcode", {
+                    state: { email: formData.email }
+                });
+            } catch (error) {
+                const message = error.response?.data?.message || 'Registration failed. Try again later.';
+                toast.error(message);
+                console.error("Registration error:", error);
+            } finally {
+                setLoading(false);
+            }
         }
-
     };
-
-
-
-
-
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="inline-block p-3 bg-indigo-600 rounded-full mb-4">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                        </svg>
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4 shadow-xl ring-4 ring-indigo-50">
+                        <ShieldCheck className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-4xl font-bold text-gray-800 mb-2"></h1>
-                    <p className="text-gray-600">Create your account to get started</p>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-2">SCORION</h1>
+                    <p className="text-gray-600 font-medium">Join the next generation of grade tracking</p>
                 </div>
 
-
-
                 {/* Form Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                    <div>
-                        <div className="space-y-6">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">Create Your Account</h2>
+                <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 transition-all hover:shadow-2xl">
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Create Student Account</h2>
 
+                        <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                                     Full Name
                                 </label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                                        <User className="w-5 h-5" />
+                                    </div>
                                     <input
                                         type="text"
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition ${errors.name ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                        placeholder="Enter your full name"
+                                        disabled={loading}
+                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.name ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
+                                        placeholder="John Doe"
                                     />
                                 </div>
-                                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                                {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">{errors.name}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                                     Email Address
                                 </label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                                        <Mail className="w-5 h-5" />
+                                    </div>
                                     <input
                                         type="email"
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition ${errors.email ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                        placeholder="your.email@example.com"
+                                        disabled={loading}
+                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
+                                        placeholder="john@example.com"
                                     />
                                 </div>
-                                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                                {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                                     Phone Number
                                 </label>
-                                <div className="relative">
-                                    <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                                        <Phone className="w-5 h-5" />
+                                    </div>
                                     <input
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition ${errors.phone ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                        disabled={loading}
+                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
                                         placeholder="1234567890"
                                     />
                                 </div>
-                                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                                {errors.phone && <p className="text-red-500 text-xs mt-1 font-medium">{errors.phone}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                                     Password
                                 </label>
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                                        <Lock className="w-5 h-5" />
+                                    </div>
                                     <input
                                         type="password"
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition ${errors.password ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                        placeholder="Minimum 8 characters"
+                                        disabled={loading}
+                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
+                                        placeholder="••••••••"
                                     />
                                 </div>
-                                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                                {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password}</p>}
                             </div>
 
-                            <div className="flex items-start">
+                            <div className="flex items-start bg-gray-50 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
                                 <input
                                     type="checkbox"
-                                    id="terms"
-                                    className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                    id="termsAccepted"
+                                    name="termsAccepted"
+                                    checked={formData.termsAccepted}
+                                    onChange={handleChange}
+                                    disabled={loading}
+                                    className="mt-1 w-5 h-5 text-indigo-600 border-gray-300 rounded-lg focus:ring-indigo-500 transition-all cursor-pointer"
                                 />
-                                <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
-                                    I agree to the Terms of Service and Privacy Policy
+                                <label htmlFor="termsAccepted" className="ml-3 text-sm text-gray-600 cursor-pointer select-none">
+                                    I agree to the <span className="text-indigo-600 font-bold hover:underline">Terms of Service</span> and <span className="text-indigo-600 font-bold hover:underline">Privacy Policy</span>
                                 </label>
                             </div>
                         </div>
@@ -183,22 +200,32 @@ export default function RegisterPage() {
                         {/* Submit Button */}
                         <div className="mt-8">
                             <button
-                                type="button"
-                                onClick={handleSubmit}
-                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-lg"
+                                type="submit"
+                                disabled={loading}
+                                className="w-full px-6 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-bold text-lg shadow-lg hover:shadow-indigo-200 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center tracking-wide"
                             >
-                                Create Account
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                                        CREATING ACCOUNT...
+                                    </>
+                                ) : (
+                                    'CREATE ACCOUNT'
+                                )}
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
                 {/* Footer */}
-                <p className="text-center text-gray-600 mt-6">
+                <p className="text-center text-gray-600 mt-8 font-medium">
                     Already have an account?{' '}
-                    <a href="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+                    <a href="/login" className="text-indigo-600 hover:text-indigo-800 font-bold underline transition-colors">
                         Sign In
                     </a>
+                </p>
+                <p className="mt-4 text-center text-xs text-gray-400 font-medium">
+                    Are you a Super Admin? <a href="/admin/login" className="text-gray-500 hover:text-indigo-600 underline">Login here</a>
                 </p>
             </div>
         </div>

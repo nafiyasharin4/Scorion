@@ -1,320 +1,255 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
-  User,
-  Phone,
-  Mail,
-  Calendar,
-  BookOpen,
-  Clock,
+  Bell,
   CheckCircle,
   XCircle,
-  Shield
+  Info,
+  Clock,
+  Check,
+  Trash2
 } from 'lucide-react';
-
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import Header from '../../Components/UserSide/Header';
 
-export default function ParentAttendanceAlert() {
-  const [isVisible, setIsVisible] = useState(true);
+export default function NotificationPage() {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all'); // all, unread, read
 
-  // Student data
-  const studentData = {
-    name: 'Rahul Kumar',
-    class: 'BCA',
-    rollNumber: '34',
-    photo: 'RK',
-    attendancePercentage: 68,
-    totalDays: 180,
-    daysPresent: 122,
-    daysAbsent: 58,
-    requiredPercentage: 75
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('userToken');
+      const response = await axios.get('http://localhost:5000/api/user/notifications', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(response.data.notifications || []);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      toast.error('Failed to load notifications');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Monthly attendance data
-  const monthlyData = [
-    { month: 'Aug', present: 18, absent: 4 },
-    { month: 'Sep', present: 16, absent: 6 },
-    { month: 'Oct', present: 20, absent: 2 },
-    { month: 'Nov', present: 15, absent: 7 },
-    { month: 'Dec', present: 14, absent: 8 }
-  ];
+  const markAsRead = async (id) => {
+    try {
+      const token = localStorage.getItem('userToken');
+      await axios.put(`http://localhost:5000/api/user/notifications/${id}/read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(notifications.map(n => 
+        n._id === id ? { ...n, isRead: true } : n
+      ));
+    } catch (error) {
+      console.error('Error marking as read:', error);
+    }
+  };
 
-  // Semester-wise attendance
-  const semesterAttendance = [
-    { semester: 'Semester 1', attendance: 72, status: 'warning' },
-    { semester: 'Semester 2', attendance: 65, status: 'critical' },
-    { semester: 'Semester 3', attendance: 70, status: 'warning' },
-    { semester: 'Semester 4', attendance: 68, status: 'critical' },
-    { semester: 'Semester 5', attendance: 60, status: 'critical' },
-    { semester: 'Semester 6', attendance: 77, status: 'warning' }
-  ];
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('userToken');
+      await axios.put('http://localhost:5000/api/user/notifications/mark-all-read', {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+      toast.error('Failed to mark all as read');
+    }
+  };
 
-  const maxPresent = Math.max(...monthlyData.map(m => m.present));
+  const getSeverityStyles = (severity) => {
+    switch (severity) {
+      case 'critical':
+        return {
+          bg: 'bg-gradient-to-br from-rose-50 to-red-50',
+          border: 'border-rose-200',
+          icon: 'bg-rose-600',
+          iconColor: 'text-white',
+          title: 'text-rose-900',
+          IconComponent: AlertTriangle
+        };
+      case 'warning':
+        return {
+          bg: 'bg-gradient-to-br from-amber-50 to-orange-50',
+          border: 'border-amber-200',
+          icon: 'bg-amber-500',
+          iconColor: 'text-white',
+          title: 'text-amber-900',
+          IconComponent: AlertTriangle
+        };
+      default:
+        return {
+          bg: 'bg-gradient-to-br from-indigo-50 to-blue-50',
+          border: 'border-indigo-200',
+          icon: 'bg-indigo-600',
+          iconColor: 'text-white',
+          title: 'text-indigo-900',
+          IconComponent: Info
+        };
+    }
+  };
+
+  const filteredNotifications = notifications.filter(n => {
+    if (filter === 'unread') return !n.isRead;
+    if (filter === 'read') return n.isRead;
+    return true;
+  });
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header />
+        <div className="flex items-center justify-center py-32">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+            <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Loading Notifications...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      {/* ✅ ADDED HEADER COMPONENT HERE */}
-      <Header title="Parent Attendance Alert" />
-
-      {/* Old Red Header stays as it is */}
-      <div className="bg-white border-b-4 border-red-500 shadow-md">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-red-100 p-3 sm:p-4 rounded-2xl">
-                <AlertTriangle className="text-red-600" size={32} />
-              </div>
-              <div className="text-center sm:text-left">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  Low Attendance Alert
-                </h1>
-                <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
-                  <Shield className="text-indigo-600" size={18} />
-                  <p className="text-sm sm:text-base text-indigo-600 font-semibold">
-                    Parent Access Only
-                  </p>
-                </div>
-              </div>
+    <div className="min-h-screen bg-slate-50">
+      <Header />
+      
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+              <Bell className="w-7 h-7 text-white" />
             </div>
-            <div className="bg-red-50 border-2 border-red-200 px-4 py-2 rounded-xl">
-              <p className="text-xs text-red-600 font-semibold uppercase tracking-wide">
-                Urgent Action Required
+            <div>
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">Notifications</h1>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                {unreadCount} Unread • {notifications.length} Total
               </p>
             </div>
           </div>
+          
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllAsRead}
+              className="px-4 py-2 bg-indigo-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-200"
+            >
+              <Check className="w-4 h-4" />
+              Mark All Read
+            </button>
+          )}
         </div>
-      </div>
 
-      {/* MAIN CONTENT */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+        {/* Filters */}
+        <div className="flex gap-2 mb-6">
+          {['all', 'unread', 'read'].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${
+                filter === f
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                  : 'bg-white text-slate-500 border border-slate-200 hover:border-indigo-200'
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
 
-        {/* Student Info Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 animate-fadeIn">
-          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
-
-            {/* Profile */}
-            <div className="flex flex-col sm:flex-row items-center gap-6 flex-1">
-              <div className="relative">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-lg">
-                  {studentData.photo}
-                </div>
-                <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-lg">
-                  <User className="text-gray-600" size={20} />
-                </div>
-              </div>
-
-              <div className="text-center sm:text-left">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  {studentData.name}
-                </h2>
-                <p className="text-base sm:text-lg text-gray-600 mt-1">
-                  {studentData.class}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Roll Number:{' '}
-                  <span className="font-semibold text-gray-700">
-                    {studentData.rollNumber}
-                  </span>
-                </p>
-              </div>
+        {/* Notifications List */}
+        {filteredNotifications.length === 0 ? (
+          <div className="bg-white rounded-3xl border border-slate-100 p-16 text-center shadow-xl">
+            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <Bell className="w-10 h-10 text-slate-200" />
             </div>
-
-            {/* Circular Progress */}
-            <div className="relative flex items-center justify-center">
-              <svg className="transform -rotate-90" width="160" height="160">
-                <circle cx="80" cy="80" r="70" stroke="#fee2e2" strokeWidth="12" fill="none" />
-                <circle
-                  cx="80"
-                  cy="80"
-                  r="70"
-                  stroke="#dc2626"
-                  strokeWidth="12"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 70}`}
-                  strokeDashoffset={`${2 * Math.PI * 70 * (1 - studentData.attendancePercentage / 100)}`}
-                  strokeLinecap="round"
-                  className="transition-all duration-1000"
-                />
-              </svg>
-
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-bold text-red-600">
-                  {studentData.attendancePercentage}%
-                </span>
-                <span className="text-xs text-gray-600 mt-1">Attendance</span>
-              </div>
-            </div>
-
+            <h2 className="text-xl font-black text-slate-400 uppercase tracking-tight mb-2">No Notifications</h2>
+            <p className="text-slate-400 text-sm font-medium">
+              {filter === 'unread' ? 'All caught up! No unread notifications.' : 'You have no notifications yet.'}
+            </p>
           </div>
-        </div>
-
-        {/* Alert message */}
-        <div className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-600 rounded-2xl shadow-lg p-6 sm:p-8 animate-fadeIn">
-          <div className="flex items-start gap-4">
-            <div className="bg-red-600 p-3 rounded-xl flex-shrink-0">
-              <AlertTriangle className="text-white" size={28} />
-            </div>
-
-            <div className="flex-1">
-              <h3 className="text-xl sm:text-2xl font-bold text-red-900 mb-3">
-                Attendance Below Required Level
-              </h3>
-              <p className="text-base sm:text-lg text-red-800 mb-6">
-                Your child's attendance has fallen below the required 75%.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-red-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Calendar className="text-indigo-600" size={20} />
-                    <p className="text-xs text-gray-600 font-semibold uppercase">Total Days</p>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900">{studentData.totalDays}</p>
-                </div>
-
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <CheckCircle className="text-green-600" size={20} />
-                    <p className="text-xs text-gray-600 font-semibold uppercase">Days Present</p>
-                  </div>
-                  <p className="text-2xl font-bold text-green-600">{studentData.daysPresent}</p>
-                </div>
-
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-red-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <XCircle className="text-red-600" size={20} />
-                    <p className="text-xs text-gray-600 font-semibold uppercase">Days Absent</p>
-                  </div>
-                  <p className="text-2xl font-bold text-red-600">{studentData.daysAbsent}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Monthly Breakdown */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 animate-fadeIn">
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <BookOpen className="text-indigo-600" size={24} /> Monthly Attendance Breakdown
-          </h3>
-
-          <div className="mb-8">
-            <div className="flex items-end justify-between gap-2 sm:gap-4 h-64">
-              {monthlyData.map((data, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full flex flex-col gap-1">
-                    <div
-                      className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-t-lg"
-                      style={{ height: `${(data.present / maxPresent) * 200}px` }}
-                    >
-                      <div className="text-white text-xs sm:text-sm font-bold text-center pt-2">
-                        {data.present}
-                      </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredNotifications.map((notification) => {
+              const styles = getSeverityStyles(notification.severity);
+              const IconComponent = styles.IconComponent;
+              
+              return (
+                <div
+                  key={notification._id}
+                  onClick={() => !notification.isRead && markAsRead(notification._id)}
+                  className={`${styles.bg} border-2 ${styles.border} rounded-3xl p-6 shadow-lg transition-all cursor-pointer hover:shadow-xl ${
+                    !notification.isRead ? 'ring-2 ring-indigo-500/20' : 'opacity-75'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`${styles.icon} p-3 rounded-2xl flex-shrink-0 shadow-lg`}>
+                      <IconComponent className={`w-6 h-6 ${styles.iconColor}`} />
                     </div>
-
-                    <div
-                      className="w-full bg-gradient-to-t from-red-500 to-red-400 rounded-b-lg"
-                      style={{ height: `${(data.absent / maxPresent) * 200}px` }}
-                    >
-                      <div className="text-white text-xs sm:text-sm font-bold text-center pt-2">
-                        {data.absent}
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className={`text-lg font-black ${styles.title} mb-1`}>
+                            {notification.title}
+                          </h3>
+                          {notification.relatedSemester && (
+                            <span className="inline-block px-2 py-0.5 bg-white/60 rounded-full text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2">
+                              Semester {notification.relatedSemester}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {!notification.isRead && (
+                            <span className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></span>
+                          )}
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                            {new Date(notification.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm font-medium text-slate-700 leading-relaxed mt-2">
+                        {notification.message}
+                      </p>
+                      
+                      <div className="flex items-center gap-4 mt-4">
+                        <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                          <Clock className="w-3 h-3" />
+                          {new Date(notification.createdAt).toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                        {notification.isRead && (
+                          <div className="flex items-center gap-1 text-[9px] font-bold text-emerald-500 uppercase tracking-widest">
+                            <CheckCircle className="w-3 h-3" />
+                            Read
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm font-semibold text-gray-700">{data.month}</p>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-
-          {/* Semester */}
-          <h4 className="text-lg font-bold text-gray-900 mb-4">Semester-wise Attendance</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {semesterAttendance.map((semester, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="font-semibold text-gray-900">{semester.semester}</p>
-                  <span
-                    className={`text-lg font-bold ${
-                      semester.status === 'critical' ? 'text-red-600' : 'text-yellow-600'
-                    }`}
-                  >
-                    {semester.attendance}%
-                  </span>
-                </div>
-
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${
-                      semester.status === 'critical' ? 'bg-red-500' : 'bg-yellow-500'
-                    }`}
-                    style={{ width: `${semester.attendance}%` }}
-                  ></div>
-                </div>
-
-                <p className="text-xs text-gray-600 mt-2">
-                  {semester.status === 'critical'
-                    ? '⚠️ Critical - Below 70%'
-                    : '⚠️ Warning - Below 75%'}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
       </div>
-
-      {/* Footer */}
-      <div className="bg-gray-900 text-white mt-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-xl font-bold mb-3">ISS ARTS AND SCIENCE COLLEGE</h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Committed to Excellence in Education
-              </p>
-              <p className="text-gray-400 text-sm">
-                © 2026 ISS ARTS AND SCIENCE COLLEGE. All rights reserved.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-3">Support & Contact</h4>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Phone className="text-indigo-400" size={18} />
-                  <span className="text-gray-300 text-sm">04933297481</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Mail className="text-indigo-400" size={18} />
-                  <span className="text-gray-300 text-sm">issascpmna@gmail.com</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="text-indigo-400" size={18} />
-                  <span className="text-gray-300 text-sm">Mon–Fri: 9:30am – 3:30pm</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 }

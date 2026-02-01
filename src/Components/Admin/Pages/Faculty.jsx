@@ -1,82 +1,35 @@
-// App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TeacherList from '../Components/TeacherManage/TeacherList';
 import TeacherModal from '../Components/TeacherManage/TeacherModal';
 import AdminHeader from '../Components/Header';
-
-// Mock data
-const initialTeachers = [
-  {
-    id: '1',
-    name: 'Dr. Sarah Johnson',
-    email: 'sarah.johnson@university.edu',
-    phone: '+1 (555) 123-4567',
-    department: 'Computer Science',
-    subject: 'Data Structures',
-    experience: '8 years',
-    qualification: 'Ph.D. in Computer Science',
-    joinDate: '2018-03-15',
-    status: 'active',
-    salary: '$85,000'
-  },
-  {
-    id: '2',
-    name: 'Prof. Michael Chen',
-    email: 'michael.chen@university.edu',
-    phone: '+1 (555) 987-6543',
-    department: 'Mathematics',
-    subject: 'Calculus',
-    experience: '12 years',
-    qualification: 'M.Sc. in Mathematics',
-    joinDate: '2015-08-22',
-    status: 'active',
-    salary: '$78,000'
-  },
-  {
-    id: '3',
-    name: 'Dr. Emily Davis',
-    email: 'emily.davis@university.edu',
-    phone: '+1 (555) 456-7890',
-    department: 'Physics',
-    subject: 'Quantum Mechanics',
-    experience: '6 years',
-    qualification: 'Ph.D. in Physics',
-    joinDate: '2019-01-10',
-    status: 'active',
-    salary: '$82,000'
-  },
-  {
-    id: '4',
-    name: 'Prof. Robert Wilson',
-    email: 'robert.wilson@university.edu',
-    phone: '+1 (555) 234-5678',
-    department: 'Chemistry',
-    subject: 'Organic Chemistry',
-    experience: '15 years',
-    qualification: 'Ph.D. in Chemistry',
-    joinDate: '2012-11-05',
-    status: 'on-leave',
-    salary: '$90,000'
-  },
-  {
-    id: '5',
-    name: 'Dr. Lisa Brown',
-    email: 'lisa.brown@university.edu',
-    phone: '+1 (555) 345-6789',
-    department: 'Biology',
-    subject: 'Genetics',
-    experience: '10 years',
-    qualification: 'Ph.D. in Biology',
-    joinDate: '2016-07-18',
-    status: 'inactive',
-    salary: '$80,000'
-  }
-];
+import { Users, UserCheck, UserMinus, UserX, Plus, Search, Filter } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 function FacultyGradePage() {
-  const [teachers, setTeachers] = useState(initialTeachers);
+  const [teachers, setTeachers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
+
+  const fetchTeachers = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get('http://localhost:5000/api/admin/teachers', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+      });
+      setTeachers(res.data.teachers || []);
+    } catch (err) {
+      toast.error('Failed to fetch teachers');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddTeacher = () => {
     setEditingTeacher(null);
@@ -88,145 +41,129 @@ function FacultyGradePage() {
     setIsModalOpen(true);
   };
 
-  const handleSaveTeacher = (teacherData) => {
-    if (editingTeacher) {
-      // Update existing teacher
-      setTeachers(teachers.map(teacher => 
-        teacher.id === editingTeacher.id 
-          ? { ...teacherData, id: editingTeacher.id }
-          : teacher
-      ));
-    } else {
-      // Add new teacher
-      const newTeacher = {
-        ...teacherData,
-        id: Date.now().toString()
-      };
-      setTeachers([...teachers, newTeacher]);
+  const handleSaveTeacher = async (teacherData) => {
+    try {
+      if (editingTeacher) {
+        await axios.put(`http://localhost:5000/api/admin/edit-teacher/${editingTeacher._id}`, teacherData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+        });
+        toast.success('Teacher updated successfully');
+      } else {
+        await axios.post('http://localhost:5000/api/admin/add-teacher', teacherData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+        });
+        toast.success('Teacher added and invite email sent!');
+      }
+      fetchTeachers();
+      setIsModalOpen(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Action failed');
     }
-    setIsModalOpen(false);
-    setEditingTeacher(null);
   };
 
-  const handleDeleteTeacher = (teacherId) => {
+  const handleDeleteTeacher = async (teacherId) => {
     if (window.confirm('Are you sure you want to delete this teacher?')) {
-      setTeachers(teachers.filter(teacher => teacher.id !== teacherId));
+      try {
+        await axios.delete(`http://localhost:5000/api/admin/delete-teacher/${teacherId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+        });
+        toast.success('Teacher deleted');
+        fetchTeachers();
+      } catch (err) {
+        toast.error('Delete failed');
+      }
     }
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingTeacher(null);
-  };
+  const stats = [
+    { 
+      label: 'Total Faculty', 
+      value: teachers.length, 
+      icon: Users, 
+      color: 'text-indigo-400', 
+      bg: 'bg-indigo-500/10' 
+    },
+    { 
+      label: 'Active', 
+      value: teachers.filter(t => !t.isBlocked).length, 
+      icon: UserCheck, 
+      color: 'text-emerald-400', 
+      bg: 'bg-emerald-500/10' 
+    },
+    { 
+      label: 'Blocked', 
+      value: teachers.filter(t => t.isBlocked).length, 
+      icon: UserX, 
+      color: 'text-rose-400', 
+      bg: 'bg-rose-500/10' 
+    },
+    { 
+      label: 'Departments', 
+      value: [...new Set(teachers.map(t => t.department))].length, 
+      icon: Filter, 
+      color: 'text-amber-400', 
+      bg: 'bg-amber-500/10' 
+    }
+  ];
 
   return (
-    <div>
-      <AdminHeader></AdminHeader>
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 mt-5">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-200">
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Teacher Management System
-              </h1>
-              <p className="text-gray-600 mt-2 text-lg">Manage faculty information and records</p>
-            </div>
-            <button
-              onClick={handleAddTeacher}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-3 w-full lg:w-auto"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span className="text-lg">Add Teacher</span>
-            </button>
+    <div className="min-h-screen bg-slate-900 text-slate-200">
+      <AdminHeader />
+      
+      <main className="container mx-auto px-4 py-8 lg:px-8 max-w-7xl">
+        {/* Page Title & Action */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl font-black text-white tracking-tight mb-2">
+              Faculty <span className="text-cyan-400">Management</span>
+            </h1>
+            <p className="text-slate-400 font-medium">Configure system access and administrative roles for academics.</p>
           </div>
+          <button
+            onClick={handleAddTeacher}
+            className="flex items-center gap-2 px-6 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 whitespace-nowrap"
+          >
+            <Plus className="w-5 h-5" />
+            Add Faculty Member
+          </button>
         </div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 transform hover:scale-105 transition duration-200">
-            <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Teachers</p>
-                <p className="text-3xl font-bold text-gray-900">{teachers.length}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 transform hover:scale-105 transition duration-200">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {teachers.filter(t => t.status === 'active').length}
-                </p>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {stats.map((stat, i) => (
+            <div key={i} className="bg-slate-800 border border-slate-700/50 p-6 rounded-2xl hover:border-slate-600 transition-colors group">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+                  <p className="text-3xl font-black text-white group-hover:text-cyan-400 transition-colors">{stat.value}</p>
+                </div>
+                <div className={`${stat.bg} p-3 rounded-xl`}>
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 transform hover:scale-105 transition duration-200">
-            <div className="flex items-center">
-              <div className="p-3 bg-yellow-100 rounded-xl">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">On Leave</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {teachers.filter(t => t.status === 'on-leave').length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 transform hover:scale-105 transition duration-200">
-            <div className="flex items-center">
-              <div className="p-3 bg-red-100 rounded-xl">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Inactive</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {teachers.filter(t => t.status === 'inactive').length}
-                </p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Teacher List */}
-        <TeacherList
-          teachers={teachers}
-          onEdit={handleEditTeacher}
-          onDelete={handleDeleteTeacher}
-        />
+        {/* List Section */}
+        <div className="bg-slate-800 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl">
+          <TeacherList
+            teachers={teachers}
+            onEdit={handleEditTeacher}
+            onDelete={handleDeleteTeacher}
+            loading={loading}
+          />
+        </div>
 
         {/* Modal */}
         {isModalOpen && (
           <TeacherModal
             teacher={editingTeacher}
             onSave={handleSaveTeacher}
-            onClose={handleCloseModal}
+            onClose={() => setIsModalOpen(false)}
           />
         )}
-      </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -25,6 +25,7 @@ import AdminLogin from "./Pages/AdminLogin";
 import CreatePasswordPage from "./Pages/CreatePass";
 import CoursesPage from "./Pages/UserPage/courses";
 import ParentAttendanceAlert from "./Pages/UserPage/Notification";
+import ProfilePage from "./Pages/UserPage/Profile";
 
 function App() {
   return (
@@ -45,7 +46,8 @@ function App() {
       <Route path="/forgotpass" element={<ForgotPassword />} />
       <Route path="/forgotcode" element={<OTPVerification />} />
       <Route path="/resetpass" element={<ResetPasswordPage />} />
-      <Route path="/createpass" element={<CreatePasswordPage />} />
+      <Route path="/createpass/:token" element={<CreatePasswordPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={<Dashboard />} />
