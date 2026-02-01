@@ -1,10 +1,15 @@
 import { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, GraduationCap } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, GraduationCap, Loader2 } from 'lucide-react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export default function DashboardLoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -18,18 +23,34 @@ export default function DashboardLoginPage() {
     
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    
     if (validateForm()) {
-      console.log('Login attempt:', { email, password });
-      alert('Login successful! Dashboard will load here.');
+      setLoading(true);
+      try {
+        const response = await axios.post('http://localhost:5000/api/teacher/login', { email, password });
+        
+        if (response.data.token) {
+          localStorage.setItem('teacherToken', response.data.token);
+          localStorage.setItem('role', 'teacher');
+          localStorage.setItem('teacherData', JSON.stringify(response.data.teacher));
+          toast.success('Faculty Login successful!');
+          navigate('/faculty/dashboard');
+        }
+      } catch (error) {
+        const message = error.response?.data?.message || 'Login failed. Please check your credentials.';
+        toast.error(message);
+        console.error('Faculty login error:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -52,11 +73,11 @@ export default function DashboardLoginPage() {
               </div>
             </div>
             <h1 className="text-2xl font-bold text-gray-800">SCORION</h1>
-            <p className="text-gray-500 text-sm">Sign in to access your dashboard</p>
+            <p className="text-gray-500 text-sm">Sign in to access Faculty Dashboard</p>
           </div>
 
           {/* Login Form */}
-          <div className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-5">
             {/* Email Field */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -70,12 +91,13 @@ export default function DashboardLoginPage() {
                   id="email"
                   type="email"
                   value={email}
+                  disabled={loading}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyPress={handleKeyPress}
                   className={`w-full pl-10 pr-4 py-2.5 border ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all`}
-                  placeholder=""
+                  placeholder="faculty@example.com"
                 />
               </div>
               {errors.email && (
@@ -96,12 +118,13 @@ export default function DashboardLoginPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
+                  disabled={loading}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyPress={handleKeyPress}
                   className={`w-full pl-10 pr-12 py-2.5 border ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all`}
-                  placeholder=""
+                  placeholder="••••••••"
                 />
                 <button
                   type="button"
@@ -122,14 +145,20 @@ export default function DashboardLoginPage() {
 
             {/* Login Button */}
             <button
-              onClick={handleLogin}
-              className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center disabled:opacity-70"
             >
-              Login
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                'Login'
+              )}
             </button>
-          </div>
-
-
+          </form>
         </div>
 
         {/* Footer */}

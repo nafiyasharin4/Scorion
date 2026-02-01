@@ -1,5 +1,5 @@
-// components/TeacherModal.js
 import React, { useState, useEffect } from 'react';
+import { X, User, Mail, Phone, BookOpen, GraduationCap, Briefcase, Calendar, IndianRupee, ShieldCheck, Loader2, Clock, ShieldAlert } from 'lucide-react';
 
 const TeacherModal = ({ teacher, onSave, onClose }) => {
   const [formData, setFormData] = useState({
@@ -8,10 +8,10 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
     phone: '',
     department: '',
     subject: '',
-    qualification: '',
-    experience: '',
+    highestQualification: '',
+    teachingExperience: '',
     joinDate: new Date().toISOString().split('T')[0],
-    status: 'active',
+    isBlocked: false,
     salary: ''
   });
 
@@ -25,11 +25,11 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
         phone: teacher.phone || '',
         department: teacher.department || '',
         subject: teacher.subject || '',
-        qualification: teacher.qualification || '',
-        experience: teacher.experience || '',
+        highestQualification: teacher.highestQualification || '',
+        teachingExperience: teacher.teachingExperience || '',
         joinDate: teacher.joinDate || new Date().toISOString().split('T')[0],
-        status: teacher.status || 'active',
-        salary: teacher.salary || ''
+        isBlocked: teacher.isBlocked || false,
+        salary: teacher.salary?.toString() || ''
       });
     }
   }, [teacher]);
@@ -37,41 +37,17 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters long';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email address is required';
+    if (!String(formData.name || '').trim()) newErrors.name = 'Full name is required';
+    if (!String(formData.email || '').trim()) {
+        newErrors.email = 'Email address is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+        newErrors.email = 'Please enter a valid email address';
     }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    }
-
-    if (!formData.department.trim()) {
-      newErrors.department = 'Department selection is required';
-    }
-
-    if (!formData.subject.trim()) {
-      newErrors.subject = 'Subject is required';
-    }
-
-    if (!formData.qualification.trim()) {
-      newErrors.qualification = 'Qualification is required';
-    }
-
-    if (!formData.experience.trim()) {
-      newErrors.experience = 'Experience information is required';
-    }
-
-    if (!formData.salary.trim()) {
-      newErrors.salary = 'Salary information is required';
-    }
+    if (!String(formData.phone || '').trim()) newErrors.phone = 'Phone number is required';
+    if (!String(formData.department || '').trim()) newErrors.department = 'Department is required';
+    if (!String(formData.subject || '').trim()) newErrors.subject = 'Subject is required';
+    if (!String(formData.highestQualification || '').trim()) newErrors.highestQualification = 'Qualification is required';
+    if (!String(formData.salary || '').trim()) newErrors.salary = 'Salary is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -80,355 +56,244 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onSave(formData);
+      // Clean salary string to Number before saving
+      const cleanSalary = typeof formData.salary === 'string' 
+        ? Number(formData.salary.replace(/[^0-9]/g, '')) 
+        : formData.salary;
+        
+      onSave({ ...formData, salary: cleanSalary });
     }
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const departments = [
-    'Computer Science',
-    'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Biology',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Civil Engineering',
-    'Business Administration',
-    'Economics',
-    'Psychology',
-    'Literature'
+    'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology',
+    'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering',
+    'Business Administration', 'Economics', 'Psychology', 'Literature'
   ];
 
-  const qualifications = [
-    'Ph.D.',
-    'M.Sc.',
-    'M.A.',
-    'B.Sc.',
-    'B.A.',
-    'M.Tech',
-    'B.Tech'
-  ];
+  const qualifications = ['Ph.D.', 'M.Sc.', 'M.A.', 'M.Tech', 'B.Tech', 'B.Sc.', 'B.A.'];
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto modal-scroll">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={onClose}></div>
+      
+      {/* Modal Container */}
+      <div className="bg-slate-800 border border-slate-700 w-full max-w-2xl rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
+        
         {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-2xl sticky top-0">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold">
-                {teacher ? 'Edit Teacher Profile' : 'Add New Teacher'}
-              </h2>
-              <p className="text-blue-100 text-sm mt-1">
-                {teacher ? 'Update faculty information' : 'Enter details to add a new faculty member'}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-blue-100 hover:text-white transition duration-150 p-2 rounded-full hover:bg-blue-500"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+        <div className="px-8 py-6 bg-slate-900 border-b border-slate-700/50 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+             <div className="bg-cyan-500/10 p-2 rounded-lg">
+                <ShieldCheck className="w-6 h-6 text-cyan-400" />
+             </div>
+             <div>
+                <h2 className="text-xl font-black text-white tracking-tight">
+                    {teacher ? 'Modify Personnel' : 'Initialize Access'}
+                </h2>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                    Internal Faculty Record
+                </p>
+             </div>
           </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-slate-500 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-8">
-          {/* Personal Information */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-              Personal Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Full Name *
-                </label>
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-8 overflow-y-auto custom-scrollbar space-y-8">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Full Name */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
                 <input
                   type="text"
-                  id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="Dr. John Smith"
+                  placeholder="e.g. Dr. Robert Fox"
+                  className={`w-full bg-slate-900 border-2 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none transition-all ${errors.name ? 'border-rose-500/50 focus:ring-rose-500/10' : 'border-slate-700 focus:ring-cyan-500/10'}`}
                 />
-                {errors.name && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.name}</span>
-                  </p>
-                )}
               </div>
+            </div>
 
-              {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email Address *
-                </label>
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Email</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
                 <input
                   type="email"
-                  id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="faculty@university.edu"
+                  placeholder="faculty@scorion.com"
+                  className={`w-full bg-slate-900 border-2 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none transition-all ${errors.email ? 'border-rose-500/50 focus:ring-rose-500/10' : 'border-slate-700 focus:ring-cyan-500/10'}`}
                 />
-                {errors.email && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.email}</span>
-                  </p>
-                )}
               </div>
+            </div>
 
-              {/* Phone */}
-              <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Phone Number *
-                </label>
+            {/* Phone */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Contact Number</label>
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
                 <input
                   type="tel"
-                  id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="+1 (555) 123-4567"
+                  placeholder="+1 (555) 000-0000"
+                  className={`w-full bg-slate-900 border-2 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none transition-all ${errors.phone ? 'border-rose-500/50 focus:ring-rose-500/10' : 'border-slate-700 focus:ring-cyan-500/10'}`}
                 />
-                {errors.phone && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.phone}</span>
-                  </p>
-                )}
               </div>
+            </div>
 
-              {/* Salary */}
-              <div>
-                <label htmlFor="salary" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Salary *
-                </label>
+            {/* Salary */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Annual Sustenance (INR)</label>
+              <div className="relative group">
+                <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-cyan-400" />
                 <input
                   type="text"
-                  id="salary"
                   name="salary"
                   value={formData.salary}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.salary ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="$75,000"
+                  placeholder="75,000"
+                  className={`w-full bg-slate-900 border-2 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none transition-all ${errors.salary ? 'border-rose-500/50 focus:ring-rose-500/10' : 'border-slate-700 focus:ring-cyan-500/10'}`}
                 />
-                {errors.salary && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.salary}</span>
-                  </p>
-                )}
               </div>
             </div>
-          </div>
 
-          {/* Professional Information */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-              Professional Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Department */}
-              <div>
-                <label htmlFor="department" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Department *
-                </label>
+            {/* Department */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Department</label>
+              <div className="relative group">
+                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
                 <select
-                  id="department"
                   name="department"
                   value={formData.department}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.department ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-cyan-500 transition-all appearance-none cursor-pointer"
                 >
-                  <option value="">Select Department</option>
-                  {departments.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
-                </select>
-                {errors.department && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.department}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Subject */}
-              <div>
-                <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Subject *
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.subject ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="Advanced Mathematics"
-                />
-                {errors.subject && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.subject}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Qualification */}
-              <div>
-                <label htmlFor="qualification" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Highest Qualification *
-                </label>
-                <select
-                  id="qualification"
-                  name="qualification"
-                  value={formData.qualification}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.qualification ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select Qualification</option>
-                  {qualifications.map(qual => (
-                    <option key={qual} value={qual}>{qual}</option>
-                  ))}
-                </select>
-                {errors.qualification && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.qualification}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Experience */}
-              <div>
-                <label htmlFor="experience" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Teaching Experience *
-                </label>
-                <input
-                  type="text"
-                  id="experience"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                    errors.experience ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="5 years"
-                />
-                {errors.experience && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{errors.experience}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Join Date */}
-              <div>
-                <label htmlFor="joinDate" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Join Date
-                </label>
-                <input
-                  type="date"
-                  id="joinDate"
-                  name="joinDate"
-                  value={formData.joinDate}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
-                />
-              </div>
-
-              {/* Status */}
-              <div>
-                <label htmlFor="status" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Employment Status
-                </label>
-                <select
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
-                >
-                  <option value="active">Active</option>
-                  <option value="on-leave">On Leave</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="">Select Domain</option>
+                  {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
                 </select>
               </div>
             </div>
+
+            {/* Subject */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Specialization</label>
+              <div className="relative group">
+                <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
+                <input
+                  type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  placeholder="Advanced Quantum Theory"
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
+                />
+              </div>
+            </div>
+
+             {/* Qualification */}
+             <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Credentials</label>
+              <div className="relative group">
+                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
+                <select
+                  name="highestQualification"
+                  value={formData.highestQualification}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-cyan-500 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="">Choose Qualification</option>
+                  {qualifications.map(q => <option key={q} value={q}>{q}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* Experience */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Experience Tenure</label>
+              <div className="relative group">
+                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
+                <input
+                  type="text"
+                  name="teachingExperience"
+                  value={formData.teachingExperience}
+                  onChange={handleChange}
+                  placeholder="8 Years"
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Join Date */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Commission Date</label>
+              <div className="relative group">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-cyan-400" />
+                <input
+                  type="date"
+                  name="joinDate"
+                  value={formData.joinDate}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Block Access Toggle */}
+            <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-2xl border border-slate-700/50 mt-auto">
+                <div className="flex items-center gap-3">
+                    <ShieldAlert className={`w-5 h-5 ${formData.isBlocked ? 'text-rose-500' : 'text-slate-500'}`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Restrict System Access</span>
+                </div>
+                <input
+                    type="checkbox"
+                    name="isBlocked"
+                    checked={formData.isBlocked}
+                    onChange={handleChange}
+                    className="w-5 h-5 rounded border-slate-700 text-rose-500 focus:ring-rose-500 bg-slate-900 cursor-pointer transition-all"
+                />
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-8 border-t border-gray-200">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/50">
             <button
               type="button"
               onClick={onClose}
-              className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition duration-150 font-semibold shadow-sm"
+              className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
             >
-              Cancel
+              Discard Changes
             </button>
             <button
               type="submit"
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition duration-150 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-10 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-cyan-500/20 active:scale-95"
             >
-              {teacher ? 'Update Teacher' : 'Add Teacher'}
+              {teacher ? 'Update Registry' : 'Grant Access'}
             </button>
           </div>
         </form>

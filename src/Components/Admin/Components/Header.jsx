@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 function AdminHeader() {
     const navigate = useNavigate();
     const handleLogout = () => {
-        
-        navigate('/login');
-    }
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('role');
+        navigate('/admin/login');
+    };
   return (
     <div>
       <nav className="bg-slate-800 shadow-lg">
@@ -29,8 +30,8 @@ function AdminHeader() {
             </div>
 
             {/* Logout Button */}
-            <button onClick={handleLogout} className="px-5 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition">
-              Login
+            <button onClick={handleLogout} className="px-5 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition">
+              Logout
             </button>
           </div>
         </div>

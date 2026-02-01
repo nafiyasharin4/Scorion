@@ -1,5 +1,5 @@
-// components/StudentModal.js
 import React, { useState, useEffect } from 'react';
+import { X, User, Mail, Phone, GraduationCap, Calendar, ShieldCheck, Database, Layers } from 'lucide-react';
 
 const StudentModal = ({ student, onSave, onClose }) => {
   const [formData, setFormData] = useState({
@@ -8,7 +8,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
     phone: '',
     course: '',
     semester: '1',
-    status: 'active',
+    isBlocked: false,
     enrollmentDate: new Date().toISOString().split('T')[0]
   });
 
@@ -22,7 +22,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
         phone: student.phone || '',
         course: student.course || '',
         semester: student.semester || '1',
-        status: student.status || 'active',
+        isBlocked: student.isBlocked || false,
         enrollmentDate: student.enrollmentDate || new Date().toISOString().split('T')[0]
       });
     }
@@ -30,268 +30,198 @@ const StudentModal = ({ student, onSave, onClose }) => {
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters long';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-
-    if (!formData.course.trim()) {
-      newErrors.course = 'Course selection is required';
-    }
-
+    if (!formData.name.trim()) newErrors.name = 'Name required';
+    if (!formData.email.trim()) newErrors.email = 'Email required';
+    if (!formData.course.trim()) newErrors.course = 'Course required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSave(formData);
-    }
+    if (validateForm()) onSave(formData);
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
   };
 
   const courses = [
-    'Computer Science',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Business Administration',
-    'Psychology',
-    'Medicine',
-    'Law',
-    'Architecture'
+    'BCA (Bachelor of Computer Applications)', 
+    'B.Sc Computer Science', 
+    'B.Sc Information Technology',
+    'B.Voc Software Development',
+    'B.Voc Data Science',
+    'B.Com Computer Application', 
+    'B.Com Finance',
+    'BBA (Bachelor of Business Administration)',
+    'B.Sc Mathematics',
+    'B.Sc Physics',
+    'B.Sc Chemistry',
+    'B.A. English Language & Literature',
+    'B.A. Economics',
+    'B.A. Sociology'
   ];
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={onClose}></div>
+      
+      <div className="bg-slate-800 border border-slate-700 w-full max-w-2xl rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
+        
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold">
-                {student ? 'Edit Student' : 'Add New Student'}
-              </h2>
-              <p className="text-blue-100 text-sm mt-1">
-                {student ? 'Update student information' : 'Fill in the details to add a new student'}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-blue-100 hover:text-white transition duration-150 p-1 rounded-full hover:bg-blue-500"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+        <div className="px-8 py-6 bg-slate-900 border-b border-slate-700/50 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+             <div className="bg-indigo-500/10 p-2 rounded-lg">
+                <Database className="w-6 h-6 text-indigo-400" />
+             </div>
+             <div>
+                <h2 className="text-xl font-black text-white tracking-tight">
+                    {student ? 'Edit Enrollment' : 'New Enrollment'}
+                </h2>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                    Authorized Student Database
+                </p>
+             </div>
           </div>
+          <button onClick={onClose} className="p-2 text-slate-500 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all">
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-8 overflow-y-auto custom-scrollbar space-y-7">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
             {/* Name */}
-            <div className="md:col-span-2">
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Enter student's full name"
-              />
-              {errors.name && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.name}</span>
-                </p>
-              )}
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Student Full Name</label>
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="e.g. Alex Rivera"
+                  className={`w-full bg-slate-900 border-2 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none transition-all ${errors.name ? 'border-rose-500/50' : 'border-slate-700 focus:ring-2 focus:ring-indigo-500/20'}`}
+                />
+              </div>
             </div>
 
             {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="student@example.com"
-              />
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.email}</span>
-                </p>
-              )}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Official Email</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="student@scorion.edu"
+                  className={`w-full bg-slate-900 border-2 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none transition-all ${errors.email ? 'border-rose-500/50' : 'border-slate-700 focus:ring-2 focus:ring-indigo-500/20'}`}
+                />
+              </div>
             </div>
 
             {/* Phone */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                Phone Number *
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="+1 (555) 123-4567"
-              />
-              {errors.phone && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.phone}</span>
-                </p>
-              )}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Contact Link</label>
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+00 123 456 78"
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                />
+              </div>
             </div>
 
             {/* Course */}
-            <div>
-              <label htmlFor="course" className="block text-sm font-semibold text-gray-700 mb-2">
-                Course *
-              </label>
-              <select
-                id="course"
-                name="course"
-                value={formData.course}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ${
-                  errors.course ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-              >
-                <option value="">Select a course</option>
-                {courses.map(course => (
-                  <option key={course} value={course}>{course}</option>
-                ))}
-              </select>
-              {errors.course && (
-                <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{errors.course}</span>
-                </p>
-              )}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Major / Program</label>
+              <div className="relative group">
+                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
+                <select
+                  name="course"
+                  value={formData.course}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="">Select Major</option>
+                  {courses.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
             </div>
 
             {/* Semester */}
-            <div>
-              <label htmlFor="semester" className="block text-sm font-semibold text-gray-700 mb-2">
-                Semester
-              </label>
-              <select
-                id="semester"
-                name="semester"
-                value={formData.semester}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
-                  <option key={sem} value={sem.toString()}>Semester {sem}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Status */}
-            <div>
-              <label htmlFor="status" className="block text-sm font-semibold text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="suspended">Suspended</option>
-              </select>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Active Semester</label>
+              <div className="relative group">
+                <Layers className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
+                <select
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
+                >
+                  {[1, 2, 3, 4, 5, 6].map(sem => <option key={sem} value={sem.toString()}>Term {sem}</option>)}
+                </select>
+              </div>
             </div>
 
             {/* Enrollment Date */}
-            <div>
-              <label htmlFor="enrollmentDate" className="block text-sm font-semibold text-gray-700 mb-2">
-                Enrollment Date
-              </label>
-              <input
-                type="date"
-                id="enrollmentDate"
-                name="enrollmentDate"
-                value={formData.enrollmentDate}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
-              />
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Admission Date</label>
+              <div className="relative group">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
+                <input
+                  type="date"
+                  name="enrollmentDate"
+                  value={formData.enrollmentDate}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                />
+              </div>
+            </div>
+
+             {/* Block Toggle */}
+             <div className="flex items-center justify-between p-4 bg-slate-900 rounded-2xl border border-slate-700/50">
+                <div className="flex items-center gap-3">
+                    <ShieldCheck className={`w-5 h-5 ${formData.isBlocked ? 'text-rose-500' : 'text-slate-500'}`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Suspend Access</span>
+                </div>
+                <input
+                    type="checkbox"
+                    name="isBlocked"
+                    checked={formData.isBlocked}
+                    onChange={handleChange}
+                    className="w-5 h-5 rounded border-slate-700 text-indigo-500 bg-slate-900 cursor-pointer"
+                />
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-3 pt-6 border-t border-slate-700/50">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-150 font-medium"
+              className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors"
             >
-              Cancel
+              Abort
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-150 font-medium shadow-sm"
+              className="px-10 py-3 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
             >
-              {student ? 'Update Student' : 'Add Student'}
+              {student ? 'Confirm Update' : 'Initialize Account'}
             </button>
           </div>
         </form>
