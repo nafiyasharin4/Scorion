@@ -28,15 +28,23 @@ export default function Profile() {
         : 'http://localhost:5000/api/user/profile';
 
       const res = await axios.get(endpoint, config);
-      setProfile(res.data);
+      if (res.data) {
+        setProfile(res.data);
+      } else {
+        toast.error('Profile data synchronization failed');
+      }
 
       if (role === 'user') {
         const marksRes = await axios.get('http://localhost:5000/api/user/marks', config);
-        setMarks(marksRes.data.marks);
+        if (marksRes.data && marksRes.data.marks) {
+          setMarks(marksRes.data.marks);
+        } else if (marksRes.data.message) {
+          toast.error(marksRes.data.message);
+        }
       }
     } catch (err) {
       console.error(err);
-      toast.error('Failed to sync profile identity');
+      toast.error(err.response?.data?.message || 'Failed to sync profile identity');
       // If unauthorized, redirect might be handled by interceptor but let's be safe
       if (err.response?.status === 401) navigate('/login');
     } finally {
@@ -201,6 +209,22 @@ export default function Profile() {
                           </p>
                        </div>
                     </div>
+
+                    {!isTeacher && (
+                      <div className="flex items-start gap-6">
+                         <div className="bg-purple-50 p-3.5 rounded-2xl border border-purple-100 shadow-sm">
+                            <Briefcase className="w-6 h-6 text-purple-600" />
+                         </div>
+                         <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                              Academic Department
+                            </p>
+                            <p className="text-xl font-black text-slate-900 tracking-tight">
+                              {profile.department || 'Unassigned'}
+                            </p>
+                         </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-10">
@@ -241,7 +265,7 @@ export default function Profile() {
                     </p>
                   </div>
                   <button 
-                    onClick={() => navigate(isTeacher ? '/faculty/dashboard' : '/user1', { state: { marks } })} 
+                    onClick={() => navigate(isTeacher ? '/faculty/dashboard' : '/userprofile', { state: { marks } })} 
                     className="px-12 py-5 bg-white text-indigo-600 font-black text-xs uppercase tracking-[0.3em] rounded-[2rem] hover:bg-indigo-50 transition-all shadow-2xl active:scale-95 whitespace-nowrap"
                   >
                     {isTeacher ? 'Sync Faculty Node' : 'Access Analytics'}

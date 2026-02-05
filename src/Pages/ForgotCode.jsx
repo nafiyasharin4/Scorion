@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Mail, ArrowLeft, Shield } from 'lucide-react';
 import { useNavigate ,useLocation} from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export default function OTPVerification() {
   const location = useLocation();
@@ -58,6 +59,8 @@ export default function OTPVerification() {
     }
   };
 
+  const purpose = location.state?.purpose || 'register'; // Default to register if not provided
+  
   const handleVerifyOTP = async () => {
     const code = otp.join('');
 
@@ -69,22 +72,33 @@ export default function OTPVerification() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/user/forgot-password/verify-otp", {
+      // Use different endpoints based on purpose
+      const endpoint = purpose === 'forgot' 
+        ? "http://localhost:5000/api/user/forgot-password/verify-otp"
+        : "http://localhost:5000/api/user/verify-otp";
+
+      const res = await axios.post(endpoint, {
         email,
         otp: code
       });
-      console.log(res.data,"kkk");
-      
+      console.log(res.data, "Verification response");
 
       if (res.data.success) {
-        navigate('/resetpass', { state: { email } });
+        toast.success(res.data.message || 'OTP Verified!');
+        // Navigate based on purpose
+        if (purpose === 'forgot') {
+          navigate('/resetpass', { state: { email } });
+        } else {
+          navigate('/login');
+        }
       } else {
-        setError("Invalid OTP");
+        toast.error(res.data.message || "Invalid OTP");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "OTP verification failed");
+      toast.error(err.response?.data?.message || "OTP verification failed");
     }
 
+    setIsLoading(true); // Keep loading state until navigation if success
     setIsLoading(false);
   };
 
@@ -95,7 +109,16 @@ export default function OTPVerification() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/user/forgot-password', { email });
+      // resend logic might need similar branching if resend endpoint is different
+      // assuming register flow might have separate resend or uses the same
+      const endpoint = purpose === 'forgot'
+        ? 'http://localhost:5000/api/user/forgot-password'
+        : 'http://localhost:5000/api/user/register'; // Or a dedicated resend endpoint if exists
+
+      // Note: If calling register again, it might fail if user already exists
+      // Check if there is a dedicated resend-otp endpoint
+      
+      const res = await axios.post(endpoint, { email });
       if (res.data.success) {
         setIsLoading(false);
         setCountdown(60);
@@ -107,18 +130,23 @@ export default function OTPVerification() {
           successMsg.classList.remove('hidden');
           setTimeout(() => successMsg.classList.add('hidden'), 3000);
         }
+        toast.success(res.data.message || 'OTP resent successfully!');
       } else {
-        setError(res.data.message || 'Failed to resend OTP');
+        toast.error(res.data.message || 'Failed to resend OTP');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      toast.error(err.response?.data?.message || 'Something went wrong');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleBackToEmail = () => {
-    navigate('/resetpass');
+    if (purpose === 'forgot') {
+      navigate('/forgotpass');
+    } else {
+      navigate('/register');
+    }
   };
 
   return (

@@ -30,6 +30,8 @@ export default function AdminLogin() {
         localStorage.setItem('role', 'admin');
         toast.success('Admin authentication successful!');
         navigate('/admin/dashboard');
+      } else {
+        toast.error(response.data.message || 'Authentication failed. Please check your credentials.');
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Invalid admin credentials.';

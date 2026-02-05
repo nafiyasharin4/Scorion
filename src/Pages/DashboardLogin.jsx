@@ -44,6 +44,8 @@ export default function DashboardLoginPage() {
           localStorage.setItem('teacherData', JSON.stringify(response.data.teacher));
           toast.success('Faculty Login successful!');
           navigate('/faculty/dashboard');
+        } else {
+          toast.error(response.data.message || 'Login failed. Please check your credentials.');
         }
       } catch (error) {
         const message = error.response?.data?.message || 'Login failed. Please check your credentials.';

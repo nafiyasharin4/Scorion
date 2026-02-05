@@ -2,32 +2,32 @@ import { useState } from 'react';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSendOTP = async () => {
     if (!email) {
-      setError('Email is required');
+      toast.error('Email is required');
       return;
     }
 
     setIsLoading(true);
-    setError('');
 
     try {
       const res = await axios.post('http://localhost:5000/api/user/forgot-password', { email });
       if (res.data.success) {    
+        toast.success(res.data.message || 'OTP sent successfully!');
         //  Navigate to OTP page and pass email
-        navigate('/forgotcode', { state: { email } });
+        navigate('/otpverification', { state: { email, purpose: 'forgot' } });
       } else {
-        setError(res.data.message || 'Failed to send OTP');
+        toast.error(res.data.message || 'Failed to send OTP');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      toast.error(err.response?.data?.message || 'Something went wrong');
     } finally {
       setIsLoading(false);
     }
@@ -79,13 +79,10 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendOTP()}
-                className={`w-full pl-10 pr-4 py-3 border ${
-                  error ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all`}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
                 placeholder="student@example.com"
               />
             </div>
-            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           </div>
 
           <button

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 
@@ -9,36 +9,32 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const socketRef = useRef(null);
 
   const connectSocket = useCallback(() => {
     const token = localStorage.getItem('userToken');
     const userData = localStorage.getItem('userData');
     const role = localStorage.getItem('role');
     
-    console.log('Socket connect attempt - token:', !!token, 'userData:', !!userData, 'role:', role);
-    
-    // Only connect socket for students (users), not faculty or admin
     if (!token || !userData || role !== 'user') {
-      console.log('Not a student user, skipping socket connection');
       return null;
+    }
+
+    if (socketRef.current?.connected) {
+      return socketRef.current;
     }
 
     let userId;
     try {
       const user = JSON.parse(userData);
       userId = user._id || user.id;
-      console.log('Parsed userId for socket:', userId);
     } catch (e) {
       console.error('Error parsing user data for socket:', e);
       return null;
     }
 
-    if (!userId) {
-      console.log('No userId found in userData');
-      return null;
-    }
+    if (!userId) return null;
 
-    // Connect to socket server
     const newSocket = io('http://localhost:5000', {
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -49,10 +45,7 @@ export const SocketProvider = ({ children }) => {
     newSocket.on('connect', () => {
       console.log('✅ Socket connected:', newSocket.id);
       setIsConnected(true);
-      
-      // Register user with their ID
       newSocket.emit('register', userId);
-      console.log('✅ Registered user with server:', userId);
     });
 
     newSocket.on('connect_error', (error) => {
@@ -64,15 +57,18 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(false);
     });
 
-    // Listen for new notifications
     newSocket.on('new-notification', (data) => {
       console.log('🔔 Received new notification:', data);
       
-      // Show toast notification
+      // EXTRA GUARD: Verifying role at time of reception
+      const currentRole = localStorage.getItem('role');
+      if (currentRole !== 'user') {
+        console.log('🚫 Suppressing student notification on non-student role:', currentRole);
+        return;
+      }
+      
       toast.custom((t) => (
-        <div 
-          className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-2 ring-indigo-500`}
-        >
+        <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-2 ring-indigo-500`}>
           <div className="flex-1 w-0 p-4">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🔔</span>
@@ -96,51 +92,42 @@ export const SocketProvider = ({ children }) => {
         position: 'top-right',
       });
       
-      // Dispatch custom event for components to listen
-      window.dispatchEvent(new CustomEvent('notification-received', { 
-        detail: data.notification 
-      }));
+      window.dispatchEvent(new CustomEvent('notification-received', { detail: data.notification }));
     });
 
+    socketRef.current = newSocket;
+    setSocket(newSocket);
     return newSocket;
   }, []);
 
   useEffect(() => {
-    // Initial connection attempt
-    const newSocket = connectSocket();
-    if (newSocket) {
-      setSocket(newSocket);
-    }
+    connectSocket();
 
-    // Listen for login events to reconnect
     const handleStorageChange = (e) => {
       if (e.key === 'userToken' && e.newValue) {
-        console.log('User logged in, connecting socket...');
-        setTimeout(() => {
-          const sock = connectSocket();
-          if (sock) setSocket(sock);
-        }, 500); // Small delay to ensure userData is also set
+        setTimeout(() => connectSocket(), 500);
+      }
+      if (e.key === 'userToken' && !e.newValue) {
+        if (socketRef.current) {
+          socketRef.current.disconnect();
+          socketRef.current = null;
+          setSocket(null);
+          setIsConnected(false);
+        }
       }
     };
 
-    // Also check periodically if user is logged in but socket not connected
     const checkConnection = setInterval(() => {
       const token = localStorage.getItem('userToken');
       const role = localStorage.getItem('role');
       
-      // Disconnect if role changed to non-user
-      if (socket?.connected && role !== 'user') {
-        console.log('Role changed to non-user, disconnecting socket...');
-        socket.disconnect();
+      if (token && role === 'user' && !socketRef.current?.connected) {
+        connectSocket();
+      } else if ((!token || role !== 'user') && socketRef.current?.connected) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
         setSocket(null);
         setIsConnected(false);
-        return;
-      }
-      
-      if (token && role === 'user' && !socket?.connected) {
-        console.log('Student token exists but socket not connected, attempting reconnect...');
-        const sock = connectSocket();
-        if (sock) setSocket(sock);
       }
     }, 5000);
 
@@ -149,21 +136,12 @@ export const SocketProvider = ({ children }) => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(checkConnection);
-      socket?.disconnect();
     };
   }, [connectSocket]);
 
-  // Expose a manual connect function
   const manualConnect = useCallback(() => {
-    if (socket?.connected) {
-      console.log('Socket already connected');
-      return;
-    }
-    const newSocket = connectSocket();
-    if (newSocket) {
-      setSocket(newSocket);
-    }
-  }, [socket, connectSocket]);
+    connectSocket();
+  }, [connectSocket]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, manualConnect }}>

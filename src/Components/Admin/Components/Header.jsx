@@ -34,7 +34,7 @@ function AdminHeader() {
           <div className="hidden md:flex items-center gap-2">
             {[
               { label: 'Dashboard', path: '/admin/dashboard' },
-              { label: 'Students', path: '/admin/stdtable' },
+              { label: 'Students', path: '/admin/students' },
               { label: 'Faculty', path: '/admin/faculty' },
             ].map((link) => (
               <a

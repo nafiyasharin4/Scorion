@@ -19,13 +19,23 @@ function MarkManagePage() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('teacherToken');
+      const headers = { Authorization: `Bearer ${token}` };
       
       // 1. Fetch all students
-      const studentsRes = await axios.get('http://localhost:5000/api/teacher/studentsearch/');
+      const studentsRes = await axios.get('http://localhost:5000/api/teacher/studentsearch/', { headers });
+      if (!studentsRes.data.students) {
+        toast.error('Failed to retrieve student roster');
+        return;
+      }
       const allStudents = studentsRes.data.students;
 
       // 2. Fetch all marks
-      const marksRes = await axios.get('http://localhost:5000/api/teacher/marks');
+      const marksRes = await axios.get('http://localhost:5000/api/teacher/marks', { headers });
+      if (!marksRes.data.marks) {
+        toast.error('Failed to retrieve mark records');
+        return;
+      }
       const allMarks = marksRes.data.marks;
 
       // 3. Merge data
@@ -58,7 +68,7 @@ function MarkManagePage() {
       setStudents(mergedStudents);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to synchronize academic records');
+      toast.error(error.response?.data?.message || 'Failed to synchronize academic records');
     } finally {
       setLoading(false);
     }
@@ -72,6 +82,8 @@ function MarkManagePage() {
 
   const handleSaveMarks = async (studentId, semester, markData) => {
     try {
+      const token = localStorage.getItem('teacherToken');
+      const headers = { Authorization: `Bearer ${token}` };
       const student = students.find(s => s.id === studentId);
       const existingMark = student.marks[semester];
 
@@ -80,7 +92,7 @@ function MarkManagePage() {
         await axios.put(`http://localhost:5000/api/teacher/update/${existingMark._id}`, {
           ...markData,
           SGPA: markData.sgpa // Match backend field casing if necessary
-        });
+        }, { headers });
         toast.success(`Semester ${semester} marks updated`);
       } else {
         // Add new mark
@@ -89,7 +101,7 @@ function MarkManagePage() {
           semester,
           ...markData
         };
-        await axios.post('http://localhost:5000/api/teacher/add-mark', payload);
+        await axios.post('http://localhost:5000/api/teacher/add-mark', payload, { headers });
         toast.success(`Marks initialized for Semester ${semester}`);
       }
       
@@ -100,7 +112,7 @@ function MarkManagePage() {
       setSelectedSemester('');
     } catch (error) {
       console.error('Error saving marks:', error);
-      toast.error('Critical failure in mark synchronization');
+      toast.error(error.response?.data?.message || 'Critical failure in mark synchronization');
     }
   };
 

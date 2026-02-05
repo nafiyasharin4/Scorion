@@ -12,16 +12,59 @@ export default function RegisterPage() {
         email: '',
         phone: '',
         password: '',
+        department: '',
+        course: '',
         termsAccepted: false
     });
     const [errors, setErrors] = useState({});
 
+    // Calicut University Mapping
+    const DEPARTMENTS = {
+        'Computer Science': [
+            'BCA (Bachelor of Computer Applications)',
+            'BSc Computer Science',
+            'BSc Information Technology',
+            'MSc Computer Science',
+            'MCA (Master of Computer Applications)'
+        ],
+        'Commerce': [
+            'BCom Finance',
+            'BCom Computer Application',
+            'BCom Cooperation',
+            'MCom Finance',
+            'BBA (Bachelor of Business Administration)'
+        ],
+        'Science': [
+            'BSc Physics',
+            'BSc Mathematics',
+            'BSc Chemistry',
+            'BSc Zoology',
+            'BSc Botany'
+        ],
+        'Arts & Humanities': [
+            'BA English',
+            'BA Economics',
+            'BA Malayalam',
+            'BA Sociology',
+            'BA History'
+        ]
+    };
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData({ 
-            ...formData, 
-            [name]: type === 'checkbox' ? checked : value 
-        });
+        
+        if (name === 'department') {
+            setFormData({ 
+                ...formData, 
+                department: value,
+                course: '' // Reset course when department changes
+            });
+        } else {
+            setFormData({ 
+                ...formData, 
+                [name]: type === 'checkbox' ? checked : value 
+            });
+        }
         setErrors({ ...errors, [name]: '' });
     };
 
@@ -46,6 +89,9 @@ export default function RegisterPage() {
         } else if (formData.password.length < 8) {
             newErrors.password = 'Password must be at least 8 characters';
         }
+        if (!formData.department) newErrors.department = 'Department is required';
+        if (!formData.course) newErrors.course = 'Course is required';
+
         if (!formData.termsAccepted) {
             toast.error('Please accept the Terms and Conditions');
             return;
@@ -56,19 +102,23 @@ export default function RegisterPage() {
         if (Object.keys(newErrors).length === 0) {
             setLoading(true);
             try {
-                // Changed from admin/register to user/register
                 const response = await axios.post("http://localhost:5000/api/user/register", {
                     name: formData.name,
                     email: formData.email,
                     phone: formData.phone,
-                    password: formData.password
+                    password: formData.password,
+                    department: formData.department,
+                    course: formData.course
                 });
 
-                toast.success('Registration successful! Please verify your email.');
-                // Backend usually sends OTP to email
-                navigate("/forgotcode", {
-                    state: { email: formData.email }
-                });
+                if (response.data.success || response.status === 201 || response.status === 200) {
+                    toast.success(response.data.message || 'Registration successful! Please verify your email.');
+                    navigate("/otpverification", {
+                        state: { email: formData.email, purpose: 'register' }
+                    });
+                } else {
+                    toast.error(response.data.message || 'Registration failed');
+                }
             } catch (error) {
                 const message = error.response?.data?.message || 'Registration failed. Try again later.';
                 toast.error(message);
@@ -81,118 +131,161 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-md my-10">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4 shadow-xl ring-4 ring-indigo-50">
                         <ShieldCheck className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-4xl font-bold text-gray-800 mb-2">SCORION</h1>
-                    <p className="text-gray-600 font-medium">Join the next generation of grade tracking</p>
+                    <p className="text-gray-600 font-medium text-sm">Join the next generation of academic intelligence</p>
                 </div>
 
                 {/* Form Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 transition-all hover:shadow-2xl">
+                <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 border border-gray-100 transition-all">
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Create Student Account</h2>
+                        <div className="mb-6">
+                            <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-1">Onboarding Protocol</p>
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Initialize Account</h2>
+                        </div>
 
                         <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    Full Name
-                                </label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
-                                        <User className="w-5 h-5" />
+                            {/* Personal Info Group */}
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                        Identity Name
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                            <User className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            className={`w-full pl-11 pr-4 py-3.5 bg-slate-50 border rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all ${errors.name ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
+                                            placeholder="Full Name"
+                                        />
                                     </div>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        disabled={loading}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.name ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                                        placeholder="John Doe"
-                                    />
+                                    {errors.name && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.name}</p>}
                                 </div>
-                                {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">{errors.name}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    Email Address
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                    Communication Node
                                 </label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
-                                        <Mail className="w-5 h-5" />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                        <Mail className="w-4 h-4" />
                                     </div>
                                     <input
                                         type="email"
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        disabled={loading}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                                        placeholder="john@example.com"
+                                        className={`w-full pl-11 pr-4 py-3.5 bg-slate-50 border rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all ${errors.email ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
+                                        placeholder="email@example.com"
                                     />
                                 </div>
-                                {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email}</p>}
+                                {errors.email && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.email}</p>}
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    Phone Number
-                                </label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
-                                        <Phone className="w-5 h-5" />
-                                    </div>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
+                            {/* Academic Selection Group */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                        Department
+                                    </label>
+                                    <select
+                                        name="department"
+                                        value={formData.department}
                                         onChange={handleChange}
-                                        disabled={loading}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                                        placeholder="1234567890"
-                                    />
+                                        className={`w-full px-4 py-3.5 bg-slate-50 border rounded-2xl text-[11px] font-black uppercase tracking-wider text-slate-700 outline-none transition-all appearance-none cursor-pointer ${errors.department ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
+                                    >
+                                        <option value="">Select Domain</option>
+                                        {Object.keys(DEPARTMENTS).map(dept => (
+                                            <option key={dept} value={dept}>{dept}</option>
+                                        ))}
+                                    </select>
+                                    {errors.department && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.department}</p>}
                                 </div>
-                                {errors.phone && <p className="text-red-500 text-xs mt-1 font-medium">{errors.phone}</p>}
-                            </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    Password
-                                </label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
-                                        <Lock className="w-5 h-5" />
-                                    </div>
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        value={formData.password}
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                        Academic Course
+                                    </label>
+                                    <select
+                                        name="course"
+                                        value={formData.course}
                                         onChange={handleChange}
-                                        disabled={loading}
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                                        placeholder="••••••••"
-                                    />
+                                        disabled={!formData.department}
+                                        className={`w-full px-4 py-3.5 bg-slate-50 border rounded-2xl text-[11px] font-black uppercase tracking-wider text-slate-700 outline-none transition-all appearance-none cursor-pointer ${errors.course ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50'}`}
+                                    >
+                                        <option value="">Select Protocol</option>
+                                        {formData.department && DEPARTMENTS[formData.department].map(course => (
+                                            <option key={course} value={course}>{course}</option>
+                                        ))}
+                                    </select>
+                                    {errors.course && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.course}</p>}
                                 </div>
-                                {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password}</p>}
                             </div>
 
-                            <div className="flex items-start bg-gray-50 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                        Phone Access
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                            <Phone className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            className={`w-full pl-11 pr-4 py-3.5 bg-slate-50 border rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all ${errors.phone ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
+                                            placeholder="1234567890"
+                                        />
+                                    </div>
+                                    {errors.phone && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.phone}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                        Security Key
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                            <Lock className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            className={`w-full pl-11 pr-4 py-3.5 bg-slate-50 border rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all ${errors.password ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                    {errors.password && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.password}</p>}
+                                </div>
+                            </div>
+
+                            <div className="flex items-start bg-slate-50 p-4 rounded-2xl border border-slate-100 hover:bg-slate-100/50 transition-colors">
                                 <input
                                     type="checkbox"
                                     id="termsAccepted"
                                     name="termsAccepted"
                                     checked={formData.termsAccepted}
                                     onChange={handleChange}
-                                    disabled={loading}
-                                    className="mt-1 w-5 h-5 text-indigo-600 border-gray-300 rounded-lg focus:ring-indigo-500 transition-all cursor-pointer"
+                                    className="mt-1 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 transition-all cursor-pointer"
                                 />
-                                <label htmlFor="termsAccepted" className="ml-3 text-sm text-gray-600 cursor-pointer select-none">
-                                    I agree to the <span className="text-indigo-600 font-bold hover:underline">Terms of Service</span> and <span className="text-indigo-600 font-bold hover:underline">Privacy Policy</span>
+                                <label htmlFor="termsAccepted" className="ml-3 text-[10px] font-bold text-slate-500 uppercase tracking-wide leading-relaxed cursor-pointer select-none">
+                                    I authorize the <span className="text-indigo-600 font-black hover:underline">Neural Terms</span> and <span className="text-indigo-600 font-black hover:underline">Data Protocols</span>
                                 </label>
                             </div>
                         </div>
@@ -202,15 +295,15 @@ export default function RegisterPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full px-6 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-bold text-lg shadow-lg hover:shadow-indigo-200 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center tracking-wide"
+                                className="w-full px-6 py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-indigo-500/20 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center"
                             >
                                 {loading ? (
                                     <>
-                                        <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                                        CREATING ACCOUNT...
+                                        <Loader2 className="w-4 h-4 mr-3 animate-spin" />
+                                        Processing...
                                     </>
                                 ) : (
-                                    'CREATE ACCOUNT'
+                                    'Initialize Protocol'
                                 )}
                             </button>
                         </div>

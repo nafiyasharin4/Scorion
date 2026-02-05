@@ -25,15 +25,20 @@ export default function GradePredictorHome() {
       const res = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setUser(res.data);
+      if (res.data) {
+        setUser(res.data);
+      } else {
+        console.error('Home identity sync failed: No data');
+      }
     } catch (err) {
-      console.error('Home identity sync failed');
+      console.error('Home identity sync failed:', err);
+      // Optional: toast.error('Identity sync failed');
     }
   };
 
   const handleDashboard = () => {
     const role = localStorage.getItem('role');
-    navigate(role === 'teacher' ? '/faculty/dashboard' : '/user1');
+    navigate(role === 'teacher' ? '/faculty/dashboard' : '/userprofile');
   };
 
   return (

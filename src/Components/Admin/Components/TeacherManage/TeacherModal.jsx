@@ -78,9 +78,10 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   };
 
   const departments = [
-    'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology',
-    'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering',
-    'Business Administration', 'Economics', 'Psychology', 'Literature'
+    'Computer Science',
+    'Commerce',
+    'Science',
+    'Arts & Humanities'
   ];
 
   const qualifications = ['Ph.D.', 'M.Sc.', 'M.A.', 'M.Tech', 'B.Tech', 'B.Sc.', 'B.A.'];
@@ -195,7 +196,7 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   onChange={handleChange}
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-cyan-500 transition-all appearance-none cursor-pointer"
                 >
-                  <option value="">Select Domain</option>
+                  <option value="">Select Department</option>
                   {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
                 </select>
               </div>

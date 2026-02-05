@@ -26,12 +26,12 @@ const GradePredictionResult = () => {
     } 
     // Priority 3: No data available, redirect back
     else {
-      navigate('/user1');
+      navigate('/userprofile');
     }
   }, [location.state, navigate]);
 
   const handlePredictAgain = () => {
-    navigate('/user1');
+    navigate('/userprofile');
   };
 
   const getGradeDetails = (grade) => {
@@ -69,7 +69,7 @@ const GradePredictionResult = () => {
       <div className="max-w-7xl mx-auto py-10 lg:py-16 px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* Core Identity Hub */}
-        <div className="bg-white border border-slate-100 rounded-[3.5rem] p-10 shadow-2xl shadow-indigo-500/5 relative overflow-hidden text-slate-800">
+        <div className="bg-white border border-slate-100 rounded-[3.5rem] p-10 shadow-2xl shadow-indigo-500/5 relative text-slate-800">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-700"></div>
           <div className="flex flex-col md:flex-row justify-between items-center gap-8 relative z-10 font-black">
              <div>

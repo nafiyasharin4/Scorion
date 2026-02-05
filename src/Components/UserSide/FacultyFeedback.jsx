@@ -56,8 +56,8 @@ const FacultyFeedback = ({ semesterData }) => {
             <Lightbulb className="w-5 h-5 text-amber-500" />
             <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Overall Performance Insight</h4>
           </div>
-          <div className="bg-white border border-purple-200 rounded-2xl p-5 shadow-sm">
-            <p className="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-wrap">
+          <div className="bg-white border border-purple-200 rounded-2xl p-5 shadow-sm max-h-60 overflow-y-auto custom-scrollbar">
+            <p className="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-wrap break-words">
               {overall}
             </p>
           </div>
@@ -72,19 +72,19 @@ const FacultyFeedback = ({ semesterData }) => {
             <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Subject Focus Areas</h4>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {subjectSpecific.map((item, idx) => (
               <div 
                 key={idx}
-                className="bg-white border-l-4 border-indigo-400 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white border-l-4 border-indigo-400 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <h5 className="text-xs font-black text-slate-900 uppercase tracking-wide">
+                  <h5 className="text-xs font-black text-slate-900 uppercase tracking-wide truncate">
                     {item.subjectName}
                   </h5>
                 </div>
-                <p className="text-sm font-medium text-slate-700 leading-relaxed ml-4 whitespace-pre-wrap">
+                <p className="text-sm font-medium text-slate-700 leading-relaxed ml-4 whitespace-pre-wrap break-words">
                   {item.feedback}
                 </p>
               </div>

@@ -41,10 +41,14 @@ const StudentDashboard = () => {
       ]);
 
       setProfile(profileRes.data);
-      setMarks(marksRes.data.marks);
+      if (marksRes.data.success || marksRes.data.marks) {
+        setMarks(marksRes.data.marks || []);
+      } else {
+        toast.error(marksRes.data.message || 'Failed to load marks');
+      }
     } catch (error) {
       console.error('Fetch error:', error);
-      toast.error('Failed to load performance profile');
+      toast.error(error.response?.data?.message || 'Failed to load performance profile');
     } finally {
       setLoading(false);
     }
@@ -53,7 +57,7 @@ const StudentDashboard = () => {
   const handlePredictClick = () => {
     if (isPredicted) {
       // Pass the specific selected semester data
-      navigate('/GPresult', { 
+      navigate('/Gradepredictionresults', { 
         state: { 
           marks, 
           profile,
@@ -135,7 +139,7 @@ const StudentDashboard = () => {
               </div>
             </div>
             <button 
-              onClick={() => window.location.href = '/notification'}
+              onClick={() => window.location.href = '/notifications'}
               className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all"
             >
               View Details
@@ -159,6 +163,9 @@ const StudentDashboard = () => {
               <div className="flex items-center gap-4 mt-3">
                  <span className="px-3 py-1 bg-white border border-slate-100 rounded-full text-[10px] font-black text-slate-500 uppercase tracking-widest shadow-sm">
                    {profile?.course}
+                 </span>
+                 <span className="px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full text-[10px] font-black text-indigo-600 uppercase tracking-widest shadow-sm">
+                   {profile?.department}
                  </span>
                  <span className="px-3 py-1 bg-indigo-600 rounded-full text-[10px] font-black text-white uppercase tracking-widest shadow shadow-indigo-200">
                    Phase {profile?.semester}

@@ -7,6 +7,7 @@ export default function FacultyDashboard() {
   const [data, setData] = useState({
     students: [],
     marks: [],
+    profile: null,
     loading: true
   });
 
@@ -16,18 +17,33 @@ export default function FacultyDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [stuRes, markRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/teacher/studentsearch/'),
-        axios.get('http://localhost:5000/api/teacher/marks')
+      const token = localStorage.getItem('teacherToken');
+      const [stuRes, markRes, profileRes] = await Promise.all([
+        axios.get('http://localhost:5000/api/teacher/studentsearch/', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('http://localhost:5000/api/teacher/marks', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('http://localhost:5000/api/teacher/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
       ]);
+      const localTeacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
       setData({
         students: stuRes.data.students,
         marks: markRes.data.marks,
+        profile: { ...localTeacher, ...profileRes.data },
         loading: false
       });
     } catch (err) {
       console.error('Dashboard synchronization failed:', err);
-      setData(prev => ({ ...prev, loading: false }));
+      const localTeacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+      setData(prev => ({ 
+        ...prev, 
+        profile: localTeacher,
+        loading: false 
+      }));
     }
   };
 
@@ -89,12 +105,21 @@ export default function FacultyDashboard() {
 
         {/* Header */}
         <div className="mb-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-black text-white tracking-tight mb-2">
-                Faculty <span className="text-cyan-400">Dashboard</span>
-              </h1>
-              <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Registry Monitoring & Oversight</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-cyan-500/20">
+                {data.profile?.name?.charAt(0) || 'F'}
+              </div>
+              <div>
+                <h1 className="text-3xl font-black text-white tracking-tight">
+                  Welcome back, <span className="text-cyan-400">{data.profile?.name || 'Faculty'}</span>
+                </h1>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Registry Monitoring & Oversight</span>
+                  <div className="w-1 h-1 rounded-full bg-slate-700"></div>
+                  <span className="text-indigo-400 font-black uppercase tracking-widest text-[10px]">{data.profile?.department || 'Department N/A'}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

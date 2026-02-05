@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 function TeacherHeader() {
     const navigate = useNavigate();
+    const teacherData = JSON.parse(localStorage.getItem('teacherData') || '{}');
+
     const handleLogout = () => {
         localStorage.removeItem('teacherToken');
         localStorage.removeItem('role');
@@ -52,13 +54,20 @@ function TeacherHeader() {
             ))}
           </div>
 
-          {/* Logout Button */}
-          <button 
-            onClick={handleLogout} 
-            className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all active:scale-95"
-          >
-            Logout
-          </button>
+          {/* Right Section: Profile & Logout */}
+          <div className="flex items-center gap-6">
+            <div className="hidden lg:flex flex-col items-end">
+              <span className="text-xs font-black text-white uppercase tracking-wider">{teacherData.name || 'Faculty'}</span>
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{teacherData.department || 'Staff'}</span>
+            </div>
+            
+            <button 
+              onClick={handleLogout} 
+              className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all active:scale-95"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </nav>

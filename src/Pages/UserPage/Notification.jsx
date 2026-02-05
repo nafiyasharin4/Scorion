@@ -33,10 +33,14 @@ export default function NotificationPage() {
       const response = await axios.get('http://localhost:5000/api/user/notifications', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setNotifications(response.data.notifications || []);
+      if (response.data.success || response.data.notifications) {
+        setNotifications(response.data.notifications || []);
+      } else {
+        toast.error(response.data.message || 'Failed to fetch notifications');
+      }
     } catch (error) {
       console.error('Error fetching notifications:', error);
-      toast.error('Failed to load notifications');
+      toast.error(error.response?.data?.message || 'Failed to load notifications');
     } finally {
       setLoading(false);
     }
@@ -239,7 +243,7 @@ export default function NotificationPage() {
                           </div>
                         </div>
                         
-                        <p className="text-sm font-medium text-slate-700 leading-relaxed mt-2">
+                        <p className="text-sm font-medium text-slate-700 leading-relaxed mt-2 break-words">
                           {notification.message}
                         </p>
                         

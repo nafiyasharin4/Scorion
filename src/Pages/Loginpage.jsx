@@ -43,23 +43,25 @@ export default function LoginPage() {
         password: formData.password
       });
 
-      if (response.data.token) {
-        const tokenKey = formData.isFaculty ? 'teacherToken' : 'userToken';
-        const role = formData.isFaculty ? 'teacher' : 'user';
-        
-        localStorage.setItem(tokenKey, response.data.token);
-        localStorage.setItem('role', role);
-        
-        if (formData.isFaculty) {
-          localStorage.setItem('teacherData', JSON.stringify(response.data.teacher));
-          toast.success('Faculty Login successful!');
-          navigate('/faculty/dashboard');
+        if (response.data.token) {
+          const tokenKey = formData.isFaculty ? 'teacherToken' : 'userToken';
+          const role = formData.isFaculty ? 'teacher' : 'user';
+          
+          localStorage.setItem(tokenKey, response.data.token);
+          localStorage.setItem('role', role);
+          
+          if (formData.isFaculty) {
+            localStorage.setItem('teacherData', JSON.stringify(response.data.teacher));
+            toast.success('Faculty Login successful!');
+            navigate('/faculty/dashboard');
+          } else {
+            localStorage.setItem('userData', JSON.stringify(response.data.user));
+            toast.success('Student Login successful!');
+            navigate('/home');
+          }
         } else {
-          localStorage.setItem('userData', JSON.stringify(response.data.user));
-          toast.success('Student Login successful!');
-          navigate('/home');
+          toast.error(response.data.message || 'Login failed. Please check your credentials.');
         }
-      }
     } catch (error) {
       const message = error.response?.data?.message || 'Login failed. Please check your credentials.';
       toast.error(message);

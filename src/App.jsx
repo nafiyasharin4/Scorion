@@ -13,7 +13,6 @@ import StudentProfile from "./Pages/UserPage/UserPage";
 import CommunityPage from "./Pages/UserPage/Community";
 import AboutPage from "./Pages/UserPage/AboutPage";
 import GradePredictionResult from "./Pages/UserPage/GradePredictionResult";
-import DashboardLoginPage from "./Pages/DashboardLogin";
 import ForgotPassword from "./Pages/UserPage/ForgotPass";
 import OTPVerification from "./Pages/ForgotCode";
 import ResetPasswordPage from "./Pages/Resetpass";
@@ -32,23 +31,44 @@ import ProfilePage from "./Pages/UserPage/Profile";
 function App() {
   return (
     <SocketProvider>
-      <Toaster position="top-right" />
+      <Toaster 
+        position="bottom-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#3b3db6ff',
+            color: '#f8fafc',
+            borderRadius: '1rem',
+            fontSize: '0.875rem',
+            fontWeight: '600',
+            padding: '12px 24px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<GradePredictionLanding />} />
         <Route path="/login" element={<Loginpage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/user1" element={<StudentProfile />} />
+        <Route path="/userprofile" element={<StudentProfile />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/notification" element={<ParentAttendanceAlert />} />
-        <Route path="/GPresult" element={<GradePredictionResult />} />
-        <Route path="/DBlogin" element={<DashboardLoginPage />} />
+        <Route path="/notifications" element={<ParentAttendanceAlert />} />
+        <Route path="/Gradepredictionresults" element={<GradePredictionResult />} />
         <Route path="/forgotpass" element={<ForgotPassword />} />
-        <Route path="/forgotcode" element={<OTPVerification />} />
+        <Route path="/otpverification" element={<OTPVerification />} />
         <Route path="/resetpass" element={<ResetPasswordPage />} />
         <Route path="/createpass/:token" element={<CreatePasswordPage />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -56,7 +76,7 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/faculty" element={<FacultyGradePage />} />
-        <Route path="/admin/stdtable" element={<StudentGradeTable />} />
+        <Route path="/admin/students" element={<StudentGradeTable />} />
         <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Faculty Routes */}

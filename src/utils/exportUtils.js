@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 /**
@@ -51,7 +51,7 @@ export const exportToPDF = (studentInfo, semesterData) => {
     getGradeStatus(sub.grade)
   ]);
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: 85,
     head: [tableColumn],
     body: tableRows,
@@ -62,7 +62,7 @@ export const exportToPDF = (studentInfo, semesterData) => {
   });
 
   // Summary Section
-  const finalY = doc.lastAutoTable.finalY + 15;
+  const finalY = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 85) + 15;
   
   doc.setFillColor(248, 250, 252);
   doc.roundedRect(15, finalY, 180, 30, 3, 3, 'F');

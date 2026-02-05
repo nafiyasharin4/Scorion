@@ -1,5 +1,7 @@
 // MarkModal.jsx
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const MarkModal = ({ student, semester, onSave, onClose }) => {
   const [formData, setFormData] = useState({
@@ -24,25 +26,42 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
     'F': 0
   };
 
-  const CALICUT_UNIVERSITY_SUBJECTS = {
-    '1': ['English-I', 'Critical Thinking', 'Mathematical Foundation', 'Computer Fundamentals & HTML', 'Programming in C'],
-    '2': ['English-II', 'Discrete Mathematics', 'Data Structures using C', 'Financial Accounting', 'C++ Programming'],
-    '3': ['Database Management System', 'Python Programming', 'Numerical Methods', 'Data Communication', 'Digital Electronics'],
-    '4': ['Operating Systems', 'Java Programming', 'Microprocessors', 'E-Commerce', 'Computer Networks'],
-    '5': ['Android Programming', 'Web Programming (PHP)', 'Software Engineering', 'Computer Graphics', 'Java Practical'],
-    '6': ['System Software', 'Machine Learning', 'Android Practical', 'Project Work', 'Viva-Voce']
+  const [syllabus, setSyllabus] = useState(null);
+  const [syllabusLoading, setSyllabusLoading] = useState(false);
+
+  useEffect(() => {
+    if (formData.semester && student?.id) {
+      fetchSyllabus();
+    }
+  }, [formData.semester]);
+
+  const fetchSyllabus = async () => {
+    try {
+      setSyllabusLoading(true);
+      const token = localStorage.getItem('teacherToken');
+      const response = await axios.get(`http://localhost:5000/api/teacher/student-syllabus/${student.id}/${formData.semester}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSyllabus(response.data);
+    } catch (error) {
+      console.error('Failed to fetch student syllabus');
+      setSyllabus(null);
+    } finally {
+      setSyllabusLoading(false);
+    }
   };
 
   const populateSubjects = () => {
-    const sem = formData.semester;
-    if (CALICUT_UNIVERSITY_SUBJECTS[sem]) {
-      const universitySubjects = CALICUT_UNIVERSITY_SUBJECTS[sem].map(name => ({
-        name,
+    if (syllabus && syllabus.subjects) {
+      const universitySubjects = syllabus.subjects.map(sub => ({
+        name: sub.name,
         marks: 0,
         grade: '',
         points: 0
       }));
       setFormData(prev => ({ ...prev, subjects: universitySubjects }));
+    } else {
+      toast.error('No curriculum data found for this context');
     }
   };
 
@@ -257,13 +276,17 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
                 <button
                   type="button"
                   onClick={populateSubjects}
-                  disabled={!formData.semester}
+                  disabled={!formData.semester || syllabusLoading}
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg className={`w-3 h-3 ${syllabusLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {syllabusLoading ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    )}
                   </svg>
-                  Auto-inject Subjects
+                  {syllabusLoading ? 'Synchronizing...' : 'Auto-inject Subjects'}
                 </button>
                 <button
                   type="button"
