@@ -19,6 +19,7 @@ import ResetPasswordPage from "./Pages/Resetpass";
 import FacultyDashboard from "./Components/Faculty/Pages/Dashboard";
 import TeacherStuendtTable from "./Components/Faculty/Pages/StudentTable";
 import MarkManagePage from "./Components/Faculty/Pages/MarksManage";
+import FacultyNotificationPage from "./Components/Faculty/Pages/Notifications";
 
 // Added from conflict area
 import RegisterPage from "./Pages/Registerpage";
@@ -83,6 +84,7 @@ function App() {
         <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
         <Route path="/faculty/students" element={<TeacherStuendtTable />} />
         <Route path="/faculty/marks" element={<MarkManagePage />} />
+        <Route path="/faculty/notifications" element={<FacultyNotificationPage />} />
       </Routes>
     </SocketProvider>
   );

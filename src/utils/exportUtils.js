@@ -125,6 +125,67 @@ export const exportToExcel = (studentInfo, semesterData) => {
   XLSX.writeFile(wb, `Scorion_Data_${studentInfo?.name?.replace(/\s+/g, '_')}_Sem${semesterData.semester}.xlsx`);
 };
 
+/**
+ * Export department-wide student results to Excel
+ * @param {Array} marks - List of mark records for the department
+ * @param {String} deptName - The name of the department
+ */
+export const exportDeptSummaryToExcel = (marks, deptName) => {
+  const data = [
+    [`${deptName.toUpperCase()} DEPARTMENT PERFORMANCE SUMMARY`],
+    [`Generated: ${new Date().toLocaleString()}`],
+    [],
+    ["Name", "Course", "Semester", "Attendance %", "SGPA", "Grade", "Status"]
+  ];
+
+  marks.forEach(m => {
+    data.push([
+      m.student?.name || 'N/A',
+      m.student?.course || 'N/A',
+      m.semester || 'N/A',
+      `${m.attendancePercentage || 0}%`,
+      m.sgpa || 0,
+      m.totalGrade || 'N/A',
+      getGradeStatus(m.totalGrade)
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Dept Summary");
+  XLSX.writeFile(wb, `${deptName}_Dept_Summary_${new Date().toISOString().split('T')[0]}.xlsx`);
+};
+
+/**
+ * Export all institutional student results to Excel
+ * @param {Array} marks - All mark records in the system
+ */
+export const exportInstitutionalSummaryToExcel = (marks) => {
+  const data = [
+    ["SCORION INSTITUTIONAL ACADEMIC AUDIT"],
+    [`Date: ${new Date().toLocaleString()}`],
+    [],
+    ["Name", "Department", "Course", "Semester", "Attendance %", "SGPA", "Grade"]
+  ];
+
+  marks.forEach(m => {
+    data.push([
+      m.student?.name || 'N/A',
+      m.student?.department || 'N/A',
+      m.student?.course || 'N/A',
+      m.semester || 'N/A',
+      `${m.attendancePercentage || 0}%`,
+      m.sgpa || 0,
+      m.totalGrade || 'N/A'
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Institutional Audit");
+  XLSX.writeFile(wb, `Institutional_Audit_${new Date().toISOString().split('T')[0]}.xlsx`);
+};
+
 // Helper for status text
 const getGradeStatus = (grade) => {
   const statusMap = {

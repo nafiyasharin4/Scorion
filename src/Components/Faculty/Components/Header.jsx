@@ -1,10 +1,32 @@
-import { GraduationCap } from 'lucide-react'
-import React, { use } from 'react'
+import { GraduationCap, Bell } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function TeacherHeader() {
     const navigate = useNavigate();
+    const [notificationCount, setNotificationCount] = useState(0);
     const teacherData = JSON.parse(localStorage.getItem('teacherData') || '{}');
+
+    useEffect(() => {
+        fetchUnreadCount();
+        const interval = setInterval(fetchUnreadCount, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const token = localStorage.getItem('teacherToken');
+            if (!token) return;
+            
+            const response = await axios.get('http://localhost:5000/api/teacher/notifications/unread-count', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setNotificationCount(response.data.count || 0);
+        } catch (error) {
+            console.log('No notifications or error fetching count');
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('teacherToken');
@@ -56,6 +78,16 @@ function TeacherHeader() {
 
           {/* Right Section: Profile & Logout */}
           <div className="flex items-center gap-6">
+            <button
+               onClick={() => navigate('/faculty/notifications')}
+               className="relative p-2.5 hover:bg-slate-800 rounded-2xl transition group border border-transparent hover:border-slate-700"
+            >
+                <Bell className="w-5 h-5 text-slate-400 group-hover:text-cyan-400 transition" />
+                {notificationCount > 0 && (
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-cyan-500 rounded-full border border-slate-950 animate-pulse"></span>
+                )}
+            </button>
+
             <div className="hidden lg:flex flex-col items-end">
               <span className="text-xs font-black text-white uppercase tracking-wider">{teacherData.name || 'Faculty'}</span>
               <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{teacherData.department || 'Staff'}</span>
