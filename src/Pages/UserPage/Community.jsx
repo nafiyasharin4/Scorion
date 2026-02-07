@@ -25,11 +25,48 @@ export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [facultyList, setFacultyList] = useState([]);
+  const [expandedPostIds, setExpandedPostIds] = useState([]);
+  const [replyTexts, setReplyTexts] = useState({});
 
   useEffect(() => {
     fetchPosts();
     fetchFaculty();
   }, []);
+
+  const toggleReplies = (postId) => {
+    setExpandedPostIds(prev => 
+      prev.includes(postId) 
+        ? prev.filter(id => id !== postId) 
+        : [...prev, postId]
+    );
+  };
+
+  const handleReplyChange = (postId, text) => {
+    setReplyTexts(prev => ({
+      ...prev,
+      [postId]: text
+    }));
+  };
+
+  const handleReplySubmit = async (postId) => {
+    const text = replyTexts[postId];
+    if (text?.trim()) {
+      try {
+        const token = localStorage.getItem('userToken');
+        await axios.post(`http://localhost:5000/api/user/community/posts/${postId}/reply`, {
+          text
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        setReplyTexts(prev => ({ ...prev, [postId]: '' }));
+        toast.success('Reply synchronized with Network!');
+        fetchPosts();
+      } catch (error) {
+        toast.error('Transmission failed');
+      }
+    }
+  };
 
   const fetchFaculty = async () => {
     try {
@@ -298,14 +335,17 @@ export default function CommunityPage() {
                       <div className="pt-6 border-t border-slate-50 flex items-center gap-8">
                         <button 
                           onClick={() => handleLike(post.id)}
-                          className="flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-colors group"
+                          className={`flex items-center gap-2 transition-colors group ${post.likes > 0 ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-600'}`}
                         >
                            <ThumbsUp size={18} className="group-hover:scale-110 transition-transform" />
                            <span className="text-xs font-black">{post.likes}</span>
                         </button>
-                        <button className="flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-colors group">
+                        <button 
+                          onClick={() => toggleReplies(post.id)}
+                          className={`flex items-center gap-2 transition-colors group ${expandedPostIds.includes(post.id) ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-600'}`}
+                        >
                            <MessageCircle size={18} className="group-hover:scale-110 transition-transform" />
-                           <span className="text-xs font-black">{post.replies} Replies</span>
+                           <span className="text-xs font-black">{post.replies.length} Replies</span>
                         </button>
                         <button 
                           onClick={() => handleShare(post)}
@@ -314,6 +354,52 @@ export default function CommunityPage() {
                            <Share2 size={18} />
                         </button>
                       </div>
+
+                      {/* Expanded Replies Section */}
+                      {expandedPostIds.includes(post.id) && (
+                        <div className="mt-8 pt-8 border-t border-slate-50 space-y-6 animate-in slide-in-from-top-4 duration-300">
+                           {/* Existing Replies */}
+                           <div className="space-y-4">
+                              {post.replies.map((reply, rid) => (
+                                <div key={rid} className="flex gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                   <div className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-indigo-600 font-black text-xs">
+                                     {reply.authorName?.charAt(0) || 'U'}
+                                   </div>
+                                   <div className="flex-1">
+                                      <div className="flex justify-between items-center mb-1">
+                                        <p className="text-[10px] font-black text-slate-900 uppercase tracking-tight">{reply.authorName}</p>
+                                        <p className="text-[9px] font-bold text-slate-400">{reply.createdAt ? new Date(reply.createdAt).toLocaleDateString() : 'Just now'}</p>
+                                      </div>
+                                      <p className="text-xs font-bold text-slate-600">{reply.text}</p>
+                                   </div>
+                                </div>
+                              ))}
+                           </div>
+
+                           {/* Reply Input */}
+                           <div className="flex gap-4 items-start">
+                              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs flex-shrink-0">
+                                 {JSON.parse(localStorage.getItem('userData') || '{}').name?.charAt(0) || 'U'}
+                              </div>
+                              <div className="flex-1 relative group">
+                                 <input 
+                                   type="text"
+                                   placeholder="Synchronize your reply..."
+                                   value={replyTexts[post.id] || ''}
+                                   onChange={(e) => handleReplyChange(post.id, e.target.value)}
+                                   onKeyDown={(e) => e.key === 'Enter' && handleReplySubmit(post.id)}
+                                   className="w-full bg-slate-50 border border-slate-100 rounded-xl py-2 pl-4 pr-12 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                 />
+                                 <button 
+                                   onClick={() => handleReplySubmit(post.id)}
+                                   className="absolute right-2 top-1/2 -translate-y-1/2 text-indigo-600 hover:text-indigo-700 p-1"
+                                 >
+                                    <Send size={14} />
+                                 </button>
+                              </div>
+                           </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

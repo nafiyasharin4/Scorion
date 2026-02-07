@@ -7,6 +7,9 @@ import toast from 'react-hot-toast';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import SubjectAnalytics from '../../Components/UserSide/SubjectAnalytics';
 import FacultyFeedback from '../../Components/UserSide/FacultyFeedback';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend 
+} from 'recharts';
 
 const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -245,6 +248,144 @@ const StudentDashboard = () => {
              </div>
           </div>
         </div>
+
+        {/* PERFORMANCE ANALYTICS - Historical Perspective */}
+        {marks.length > 0 && (
+          <div className="bg-white border border-slate-100 rounded-[3.5rem] p-10 shadow-2xl shadow-indigo-500/5 relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-[100px] -mr-32 -mt-32 opacity-50"></div>
+             
+             <div className="flex items-center justify-between mb-12 relative z-10">
+                <div className="flex items-center gap-4">
+                   <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
+                      <TrendingUp className="w-6 h-6" />
+                   </div>
+                   <div>
+                     <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Intelligence Growth Chart</h2>
+                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Semester-over-Semester Analytics</p>
+                   </div>
+                </div>
+                <div className="hidden sm:flex gap-6">
+                   <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-indigo-600"></div>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">SGPA Velocity</span>
+                   </div>
+                   <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Attendance Index</span>
+                   </div>
+                </div>
+             </div>
+
+             <div className="h-[400px] w-full relative z-10">
+                <ResponsiveContainer width="100%" height="100%">
+                   <AreaChart
+                      data={marks.map(m => ({
+                        name: `Sem ${m.semester}`,
+                        sgpa: parseFloat(m.sgpa) || 0,
+                        attendance: m.attendancePercentage || 0,
+                      }))}
+                      margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                   >
+                      <defs>
+                        <linearGradient id="colorSgpa" x1="0" y1="0" x2="0" y2="1">
+                           <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
+                           <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
+                           <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                           <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }}
+                        dy={15}
+                      />
+                      <YAxis 
+                        yId="left"
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }}
+                        domain={[0, 10]}
+                      />
+                      <YAxis 
+                        yId="right"
+                        orientation="right"
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }}
+                        domain={[0, 100]}
+                        hide
+                      />
+                      <Tooltip 
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-slate-900 p-4 rounded-2xl shadow-2xl border border-white/10">
+                                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3">{label}</p>
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between gap-8">
+                                    <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">SGPA Projection</span>
+                                    <span className="text-sm font-black text-white">{payload[0].value}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-8">
+                                    <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">Attendance Status</span>
+                                    <span className="text-sm font-black text-emerald-400">{payload[1].value}%</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Area 
+                        yId="left"
+                        type="monotone" 
+                        dataKey="sgpa" 
+                        stroke="#4f46e5" 
+                        strokeWidth={4} 
+                        fillOpacity={1} 
+                        fill="url(#colorSgpa)" 
+                        animationDuration={2000}
+                      />
+                      <Area 
+                        yId="right"
+                        type="monotone" 
+                        dataKey="attendance" 
+                        stroke="#10b981" 
+                        strokeWidth={3} 
+                        strokeDasharray="5 5"
+                        fillOpacity={1} 
+                        fill="url(#colorAttendance)" 
+                        animationDuration={2500}
+                      />
+                   </AreaChart>
+                </ResponsiveContainer>
+             </div>
+
+             <div className="mt-10 p-6 bg-slate-50 border border-slate-100 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                   <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                      <Activity className="w-5 h-5" />
+                   </div>
+                   <p className="text-xs font-bold text-slate-600">
+                     Correlation detected: Your <span className="text-indigo-600 font-black uppercase">SGPA Velocity</span> reflects institutional adherence patterns.
+                   </p>
+                </div>
+                <div className="flex -space-x-3">
+                   {[1,2,3,4].map(i => (
+                     <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400 uppercase">
+                        {String.fromCharCode(64 + i)}
+                     </div>
+                   ))}
+                </div>
+             </div>
+          </div>
+        )}
 
         {/* SEMESTER SELECTOR - Navigate Between All Semesters */}
         {marks.length > 1 && (

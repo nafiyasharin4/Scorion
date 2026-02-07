@@ -51,11 +51,15 @@ const GradePredictionLanding = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-10">
-            {['Architecture', 'Intelligence', 'Protocol', 'Network'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition-colors">
-                {item}
-              </a>
-            ))}
+            <button onClick={() => navigate('/about')} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition-colors">
+              About
+            </button>
+            <a href="#architecture" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition-colors">
+              Architecture
+            </a>
+            <button onClick={() => navigate('/community')} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition-colors">
+              Network
+            </button>
           </div>
 
           <div className="flex items-center gap-4">
@@ -116,17 +120,17 @@ const GradePredictionLanding = () => {
 
               <div className="flex items-center gap-12 pt-10">
                 <div className="space-y-1">
-                  <p className="text-3xl font-black text-slate-900">98.4%</p>
+                  <p className="text-3xl font-black text-slate-900">96.8%</p>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Engine Precision</p>
                 </div>
                 <div className="w-px h-10 bg-slate-200"></div>
                 <div className="space-y-1">
-                  <p className="text-3xl font-black text-slate-900">12ms</p>
+                  <p className="text-3xl font-black text-slate-900">45ms</p>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Sync Latency</p>
                 </div>
                 <div className="w-px h-10 bg-slate-200"></div>
                 <div className="space-y-1">
-                  <p className="text-3xl font-black text-slate-900">10k+</p>
+                  <p className="text-3xl font-black text-slate-900">1.2k+</p>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Nodes Active</p>
                 </div>
               </div>
@@ -160,9 +164,9 @@ const GradePredictionLanding = () => {
 
                   <div className="space-y-4">
                      {[
-                       { name: 'Neural Networks', score: 95, color: 'bg-indigo-600' },
-                       { name: 'Quantum Logic', score: 88, color: 'bg-blue-500' },
-                       { name: 'Data Structures', score: 92, color: 'bg-indigo-400' }
+                       { name: 'Core Computing', score: 85, color: 'bg-indigo-600' },
+                       { name: 'Database Systems', score: 78, color: 'bg-blue-500' },
+                       { name: 'Algorithmic Logic', score: 82, color: 'bg-indigo-400' }
                      ].map((item) => (
                        <div key={item.name} className="space-y-2">
                           <div className="flex justify-between items-center">
@@ -177,12 +181,12 @@ const GradePredictionLanding = () => {
                   </div>
 
                   <div className="p-6 bg-slate-900 rounded-[2.5rem] mt-6 shadow-2xl">
-                     <div className="flex items-center gap-4 mb-3">
-                        <Activity className="text-emerald-400 w-4 h-4" />
-                        <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Stability Profile: High</span>
+                      <div className="flex items-center gap-4 mb-3">
+                        <Activity className="text-blue-400 w-4 h-4" />
+                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Stability Profile: Stable</span>
                      </div>
                      <p className="text-[11px] font-bold text-white/70 leading-relaxed uppercase tracking-widest">
-                       Projection synchronized with institutional syllabus v2.0. Clear path to distinction detected.
+                       Projection synchronized with academic syllabus v4.1. Optimized path to success recalibrated.
                      </p>
                   </div>
                 </div>
