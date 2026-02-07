@@ -35,15 +35,19 @@ const GradePredictionResult = () => {
   };
 
   const getGradeDetails = (grade) => {
+    if (!grade) return { status: 'Awaiting', color: 'text-slate-400', bgColor: 'bg-slate-50', borderColor: 'border-slate-100' };
+    const normalized = grade.trim().toUpperCase();
     const details = {
-      'A+': { status: 'Exceptional', color: 'text-indigo-600', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-100' },
-      'A': { status: 'Superior', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100' },
-      'B': { status: 'Above Average', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100' },
+      'O': { status: 'Outstanding', color: 'text-indigo-600', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-100' },
+      'A+': { status: 'Excellent', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100' },
+      'A': { status: 'Superior', color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-100' },
+      'B+': { status: 'Very Good', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100' },
+      'B': { status: 'Above Average', color: 'text-blue-500', bgColor: 'bg-blue-50/50', borderColor: 'border-blue-100' },
       'C': { status: 'Average', color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100' },
-      'D': { status: 'Pass', color: 'text-slate-600', bgColor: 'bg-slate-50', borderColor: 'border-slate-100' },
+      'P': { status: 'Pass', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-100' },
       'F': { status: 'Incomplete', color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-100' }
     };
-    return details[grade] || { status: 'Pending', color: 'text-slate-400', bgColor: 'bg-slate-50', borderColor: 'border-slate-100' };
+    return details[normalized] || { status: 'Satisfactory', color: 'text-slate-600', bgColor: 'bg-slate-50', borderColor: 'border-slate-200' };
   };
 
   const handleExportPDF = () => {
@@ -217,7 +221,7 @@ const GradePredictionResult = () => {
             <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-4 relative z-10">Visual Grade Distribution</h2>
             <div className="h-[350px] flex items-end justify-start gap-4 pt-16 relative z-10 pb-8 overflow-x-auto">
               {selectedSemesterData.subjects && selectedSemesterData.subjects.map((subject, index) => {
-                const points = {'A+':10, 'A':9, 'B':8, 'C':7, 'D':6, 'F':3}[subject.grade] || 0;
+                const points = {'O':10, 'A+':9, 'A':8, 'B+':7, 'B':6, 'C':5, 'P':4, 'F':0}[subject.grade] || (subject.marks / 10) || 0;
                 return (
                   <div key={index} className="flex-shrink-0 flex flex-col items-center gap-4 h-full group" style={{ minWidth: '60px', maxWidth: '80px' }}>
                     <div className="w-full flex-1 flex flex-col justify-end">

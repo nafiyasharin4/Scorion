@@ -59,21 +59,21 @@ function StudentGradeTable() {
       toast.error(err.response?.data?.message || 'Action failed');
     }
   };
-
-  const handleDeleteStudent = async (studentId) => {
-    if (window.confirm('Delete this student record?')) {
-      try {
-        await axios.delete(`http://localhost:5000/api/admin/delete-student/${studentId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-        });
-        toast.success('Student record removed');
-        fetchStudents();
-      } catch (err) {
-        toast.error('Deletion failed');
-      }
+  const handleToggleBlock = async (student) => {
+    const endpoint = student.isBlocked 
+      ? `http://localhost:5000/api/admin/unblock-student/${student._id}` 
+      : `http://localhost:5000/api/admin/block-student/${student._id}`;
+      
+    try {
+      await axios.put(endpoint, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+      });
+      toast.success(`Access ${student.isBlocked ? 'Authorized' : 'Suspended'}`);
+      fetchStudents();
+    } catch (err) {
+      toast.error('Action failed');
     }
   };
-
   const stats = [
     { label: 'Enrolled Students', value: students.length, icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
     { label: 'Active Learners', value: students.filter(s => !s.isBlocked).length, icon: UserCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
@@ -125,7 +125,7 @@ function StudentGradeTable() {
           <StudentList
             students={students}
             onEdit={handleEditStudent}
-            onDelete={handleDeleteStudent}
+            onToggleBlock={handleToggleBlock}
             loading={loading}
           />
         </div>

@@ -1,7 +1,8 @@
-import React from "react";
-import { Route, Routes } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
+import React, { useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 import { SocketProvider } from "./contexts/SocketContext";
+import axios from "axios";
 
 import Loginpage from "./Pages/Loginpage";
 import GradePredictionLanding from "./Pages/LandingPage";
@@ -29,7 +30,51 @@ import CoursesPage from "./Pages/UserPage/courses";
 import ParentAttendanceAlert from "./Pages/UserPage/Notification";
 import ProfilePage from "./Pages/UserPage/Profile";
 
+// Flag to prevent duplicate blocked toasts
+let isBlockedToastShown = false;
+
 function App() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Global Axios Interceptor for Blocking
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 403 && error.response.data.message === "Account blocked") {
+          if (!isBlockedToastShown) {
+            isBlockedToastShown = true;
+            
+            // Clear all auth data
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('teacherToken');
+            localStorage.removeItem('role');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('teacherData');
+            
+            toast.error(error.response.data.reason || "Your account has been blocked by the admin.", {
+              id: 'blocked-toast',
+              duration: 6000
+            });
+            
+            navigate('/login');
+
+            // Reset flag after a delay to allow future blocking toasts (e.g. if they try to log in again while blocked)
+            setTimeout(() => {
+              isBlockedToastShown = false;
+            }, 5000);
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+      isBlockedToastShown = false;
+    };
+  }, [navigate]);
+
   return (
     <SocketProvider>
       <Toaster 
@@ -59,7 +104,6 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<GradePredictionLanding />} />
         <Route path="/login" element={<Loginpage />} />
-        <Route path="/register" element={<RegisterPage />} />
 
         <Route path="/userprofile" element={<StudentProfile />} />
         <Route path="/home" element={<HomePage />} />

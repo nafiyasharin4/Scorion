@@ -108,6 +108,22 @@ const StudentDashboard = () => {
     return 'from-rose-500 to-rose-600';
   };
 
+  const getGradeColor = (grade) => {
+    if (!grade) return 'text-slate-200 bg-slate-50 border-slate-100';
+    const normalized = grade.trim().toUpperCase();
+    const colors = {
+      'O': 'text-indigo-600 bg-indigo-50 border-indigo-100',
+      'A+': 'text-emerald-600 bg-emerald-50 border-emerald-100',
+      'A': 'text-green-600 bg-green-50 border-green-100',
+      'B+': 'text-blue-600 bg-blue-50 border-blue-100',
+      'B': 'text-blue-500 bg-blue-50/50 border-blue-100',
+      'C': 'text-yellow-600 bg-yellow-50 border-yellow-100',
+      'P': 'text-orange-600 bg-orange-50 border-orange-100',
+      'F': 'text-rose-600 bg-rose-50 border-rose-100'
+    };
+    return colors[normalized] || 'text-slate-400 bg-slate-50 border-slate-100';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -216,14 +232,14 @@ const StudentDashboard = () => {
           <div className="bg-white p-8 rounded-[3rem] shadow-xl shadow-indigo-500/5 border border-slate-50 flex items-center gap-8 min-w-[280px]">
              <div className="flex flex-col">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System SGPA</span>
-                <span className={`text-5xl font-black ${isPredicted ? 'text-indigo-600' : 'text-slate-200'} transition-colors`}>
+                <span className={`text-5xl font-black ${isPredicted ? (parseFloat(selectedSemester?.sgpa) >= 4 ? 'text-emerald-600' : 'text-rose-600') : 'text-slate-200'} transition-colors`}>
                   {isPredicted ? (selectedSemester?.sgpa || '0.00') : '?.??'}
                 </span>
              </div>
              <div className="w-px h-12 bg-slate-100"></div>
              <div className="flex flex-col">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</span>
-                <span className={`text-xs font-black uppercase tracking-tighter ${isPredicted ? 'text-emerald-500' : 'text-slate-300'}`}>
+                <span className={`text-xs font-black uppercase tracking-tighter ${isPredicted ? (selectedSemester?.status === 'passed' ? 'text-emerald-500' : 'text-rose-500') : 'text-slate-300'}`}>
                    {isPredicted ? (selectedSemester?.totalGrade || 'PASSED') : 'Waiting...'}
                 </span>
              </div>
@@ -297,9 +313,9 @@ const StudentDashboard = () => {
                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Raw Mark</span>
                                 <span className="text-sm font-black text-slate-900">{subject.marks || 0}</span>
                              </div>
-                             <div className="w-[80px] flex flex-col items-center bg-slate-50 py-2 rounded-2xl border border-slate-100 group-hover:border-indigo-100 transition-all">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Grade</span>
-                                <span className={`text-base font-black ${isPredicted ? 'text-indigo-600' : 'text-slate-200'}`}>
+                             <div className={`w-[80px] flex flex-col items-center py-2 rounded-2xl border transition-all ${isPredicted ? getGradeColor(subject.grade) : 'bg-slate-50 border-slate-100'}`}>
+                                <span className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Grade</span>
+                                <span className={`text-base font-black ${!isPredicted ? 'text-slate-200' : ''}`}>
                                    {isPredicted ? subject.grade : '??'}
                                 </span>
                              </div>

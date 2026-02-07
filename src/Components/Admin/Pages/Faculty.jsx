@@ -60,21 +60,21 @@ function FacultyGradePage() {
       toast.error(err.response?.data?.message || 'Action failed');
     }
   };
-
-  const handleDeleteTeacher = async (teacherId) => {
-    if (window.confirm('Are you sure you want to delete this teacher?')) {
-      try {
-        await axios.delete(`http://localhost:5000/api/admin/delete-teacher/${teacherId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-        });
-        toast.success('Teacher deleted');
-        fetchTeachers();
-      } catch (err) {
-        toast.error('Delete failed');
-      }
+  const handleToggleBlock = async (teacher) => {
+    const endpoint = teacher.isBlocked 
+      ? `http://localhost:5000/api/admin/unblockteacher/${teacher._id}` 
+      : `http://localhost:5000/api/admin/blockteacher/${teacher._id}`;
+      
+    try {
+      await axios.put(endpoint, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+      });
+      toast.success(`Access ${teacher.isBlocked ? 'Authorized' : 'Suspended'}`);
+      fetchTeachers();
+    } catch (err) {
+      toast.error('Action failed');
     }
   };
-
   const stats = [
     { 
       label: 'Total Faculty', 
@@ -150,7 +150,7 @@ function FacultyGradePage() {
           <TeacherList
             teachers={teachers}
             onEdit={handleEditTeacher}
-            onDelete={handleDeleteTeacher}
+            onToggleBlock={handleToggleBlock}
             loading={loading}
           />
         </div>

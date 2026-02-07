@@ -15,18 +15,19 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
   });
 
   const getGradeColor = (grade) => {
+    const normalizedGrade = grade?.toUpperCase();
     const gradeColors = {
-      'A': 'bg-green-100 text-green-800 border border-green-200',
-      'A-': 'bg-green-50 text-green-700 border border-green-100',
-      'B+': 'bg-blue-100 text-blue-800 border border-blue-200',
-      'B': 'bg-blue-50 text-blue-700 border border-blue-100',
-      'B-': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-      'C+': 'bg-orange-100 text-orange-800 border border-orange-200',
-      'C': 'bg-orange-50 text-orange-700 border border-orange-100',
-      'F': 'bg-red-100 text-red-800 border border-red-200'
+      'O': 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+      'A+': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      'A': 'bg-green-500/10 text-green-400 border-green-500/20',
+      'B+': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+      'B': 'bg-blue-500/5 text-blue-300 border-blue-500/10',
+      'C': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+      'P': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+      'F': 'bg-red-500/10 text-red-400 border-red-500/20'
     };
     
-    return gradeColors[grade] || 'bg-gray-100 text-gray-800 border border-gray-200';
+    return gradeColors[normalizedGrade] || 'bg-slate-800 text-slate-400 border-slate-700';
   };
 
   const courses = [...new Set(students.map(student => student.course))];
@@ -156,9 +157,14 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
                         {semMarks ? (
                           <div className="space-y-4">
                             <div className="flex justify-between items-end">
-                               <div>
-                                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1">Performance Index</p>
-                                  <p className="text-2xl font-black text-white">{semMarks.sgpa}</p>
+                               <div className="flex-1 min-w-0">
+                                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1">Performance Index: {semMarks.sgpa}</p>
+                                  <p className="text-[10px] font-black text-white uppercase tracking-tight truncate">
+                                    {parseFloat(semMarks.sgpa) >= 7.5 ? "First Class with Distinction" :
+                                     parseFloat(semMarks.sgpa) >= 5.5 ? "First Class" :
+                                     parseFloat(semMarks.sgpa) >= 4.5 ? "Second Class" :
+                                     parseFloat(semMarks.sgpa) >= 3.5 ? "Third Class" : "Fail"}
+                                  </p>
                                </div>
                                <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getGradeColor(semMarks.totalGrade)}`}>
                                  {semMarks.totalGrade}

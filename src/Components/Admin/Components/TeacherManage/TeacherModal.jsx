@@ -80,8 +80,10 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
   const departments = [
     'Computer Science',
     'Commerce',
-    'Science',
-    'Arts & Humanities'
+    'Business Administration',
+    'Physics',
+    'Arts & Humanities',
+    'AI'
   ];
 
   const qualifications = ['Ph.D.', 'M.Sc.', 'M.A.', 'M.Tech', 'B.Tech', 'B.Sc.', 'B.A.'];
@@ -264,21 +266,6 @@ const TeacherModal = ({ teacher, onSave, onClose }) => {
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
                 />
               </div>
-            </div>
-
-            {/* Block Access Toggle */}
-            <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-2xl border border-slate-700/50 mt-auto">
-                <div className="flex items-center gap-3">
-                    <ShieldAlert className={`w-5 h-5 ${formData.isBlocked ? 'text-rose-500' : 'text-slate-500'}`} />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Restrict System Access</span>
-                </div>
-                <input
-                    type="checkbox"
-                    name="isBlocked"
-                    checked={formData.isBlocked}
-                    onChange={handleChange}
-                    className="w-5 h-5 rounded border-slate-700 text-rose-500 focus:ring-rose-500 bg-slate-900 cursor-pointer transition-all"
-                />
             </div>
           </div>
 

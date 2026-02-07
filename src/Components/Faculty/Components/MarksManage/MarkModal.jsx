@@ -18,11 +18,13 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
   const [errors, setErrors] = useState({});
 
   const gradePoints = {
-    'A+': 10,
-    'A': 9,
-    'B': 8,
-    'C': 7,
-    'D': 6,
+    'O': 10,
+    'A+': 9,
+    'A': 8,
+    'B+': 7,
+    'B': 6,
+    'C': 5,
+    'P': 4,
     'F': 0
   };
 
@@ -102,11 +104,13 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
 
   const calculateTotalGrade = (sgpa) => {
     const avgPoint = parseFloat(sgpa);
-    if (avgPoint >= 9) return "A+";
-    if (avgPoint >= 8) return "A";
-    if (avgPoint >= 7) return "B";
-    if (avgPoint >= 6) return "C";
-    if (avgPoint >= 5) return "D";
+    if (avgPoint >= 9.5) return "O";
+    if (avgPoint >= 8.5) return "A+";
+    if (avgPoint >= 7.5) return "A";
+    if (avgPoint >= 6.5) return "B+";
+    if (avgPoint >= 5.5) return "B";
+    if (avgPoint >= 4.5) return "C";
+    if (avgPoint >= 4.0) return "P"; // Corrected threshold for FYUGP
     return "F";
   };
 
@@ -145,11 +149,13 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
     if (field === 'marks') {
       updatedValue = value === '' ? 0 : parseInt(value);
       // Auto-calculate grade from marks
-      if (updatedValue >= 90) updatedSubjects[index].grade = 'A+';
-      else if (updatedValue >= 80) updatedSubjects[index].grade = 'A';
-      else if (updatedValue >= 70) updatedSubjects[index].grade = 'B';
-      else if (updatedValue >= 60) updatedSubjects[index].grade = 'C';
-      else if (updatedValue >= 40) updatedSubjects[index].grade = 'D';
+      if (updatedValue >= 95) updatedSubjects[index].grade = 'O';
+      else if (updatedValue >= 85) updatedSubjects[index].grade = 'A+';
+      else if (updatedValue >= 75) updatedSubjects[index].grade = 'A';
+      else if (updatedValue >= 65) updatedSubjects[index].grade = 'B+';
+      else if (updatedValue >= 55) updatedSubjects[index].grade = 'B';
+      else if (updatedValue >= 45) updatedSubjects[index].grade = 'C';
+      else if (updatedValue >= 35) updatedSubjects[index].grade = 'P';
       else updatedSubjects[index].grade = 'F';
     }
 
@@ -194,14 +200,29 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
+      // For FYUGP, Grade P (Point 4) is the minimum pass. 
+      // If student has an 'F' in any subject, the status should technically be 'failed' 
+      // but usually SGPA >= 4 handles the aggregate pass.
+      const hasFailedSubject = formData.subjects.some(sub => sub.grade === 'F');
+      const passingStatus = (!hasFailedSubject && parseFloat(formData.sgpa) >= 4) ? 'passed' : 'failed';
+      
       onSave(student.id, formData.semester, {
         ...formData,
-        status: parseFloat(formData.sgpa) >= 5 ? 'passed' : 'failed'
+        status: passingStatus
       });
     }
   };
 
   const gradeOptions = Object.keys(gradePoints);
+
+  const getClassName = (sgpa) => {
+    const avgPoint = parseFloat(sgpa);
+    if (avgPoint >= 7.5) return "First Class with Distinction";
+    if (avgPoint >= 6.0) return "First Class";
+    if (avgPoint >= 5.0) return "Second Class";
+    if (avgPoint >= 4.0) return "Pass";
+    return "Fail";
+  };
 
   return (
     <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center p-4 z-[100] bg-slate-950/40">
@@ -261,9 +282,9 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
               <div className="h-10 w-10 bg-cyan-500/10 rounded-xl flex items-center justify-center text-cyan-400 font-black">
                 {formData.totalGrade || '??'}
               </div>
-              <div>
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Calculated SGPA</p>
-                <p className="text-xl font-black text-white">{formData.sgpa}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest truncate">SGPA: {formData.sgpa}</p>
+                <p className="text-[10px] font-black text-white uppercase tracking-tight truncate mt-0.5">{getClassName(formData.sgpa)}</p>
               </div>
             </div>
           </div>

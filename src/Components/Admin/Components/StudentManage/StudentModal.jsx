@@ -7,6 +7,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
     email: '',
     phone: '',
     course: '',
+    department: '',
     semester: '1',
     isBlocked: false,
     enrollmentDate: new Date().toISOString().split('T')[0]
@@ -21,6 +22,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
         email: student.email || '',
         phone: student.phone || '',
         course: student.course || '',
+        department: student.department || '',
         semester: student.semester || '1',
         isBlocked: student.isBlocked || false,
         enrollmentDate: student.enrollmentDate || new Date().toISOString().split('T')[0]
@@ -32,6 +34,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Name required';
     if (!formData.email.trim()) newErrors.email = 'Email required';
+    if (!formData.department.trim()) newErrors.department = 'Department required';
     if (!formData.course.trim()) newErrors.course = 'Course required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -51,20 +54,26 @@ const StudentModal = ({ student, onSave, onClose }) => {
   };
 
   const courses = [
-    'BCA (Bachelor of Computer Applications)', 
-    'B.Sc Computer Science', 
-    'B.Sc Information Technology',
-    'B.Voc Software Development',
-    'B.Voc Data Science',
-    'B.Com Computer Application', 
-    'B.Com Finance',
-    'BBA (Bachelor of Business Administration)',
-    'B.Sc Mathematics',
-    'B.Sc Physics',
-    'B.Sc Chemistry',
-    'B.A. English Language & Literature',
-    'B.A. Economics',
-    'B.A. Sociology'
+    'BA English Language and Literature Honours',
+    'BA Economics',
+    'BBA Honours',
+    'BCA Honours',
+    'BSC Physics',
+    'Bcom Co-operation Honours',
+    'Bcom Computer Application',
+    'Bcom Finance',
+    'Mcom Finance',
+    'MA English',
+    'B.Sc. ARTIFICIAL INTELLIGENCE (HONOURS)'
+  ];
+
+  const departments = [
+    'Computer Science',
+    'Commerce',
+    'Business Administration',
+    'Physics',
+    'Arts & Humanities',
+    'AI'
   ];
 
   return (
@@ -145,9 +154,26 @@ const StudentModal = ({ student, onSave, onClose }) => {
               </div>
             </div>
 
-            {/* Course */}
+            {/* Department */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Major / Program</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Department</label>
+              <div className="relative group">
+                <Database className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
+                <select
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* Course (Program) */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Program</label>
               <div className="relative group">
                 <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-indigo-400" />
                 <select
@@ -156,7 +182,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
                   onChange={handleChange}
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
                 >
-                  <option value="">Select Major</option>
+                  <option value="">Select Program</option>
                   {courses.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
@@ -173,7 +199,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
                   onChange={handleChange}
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
                 >
-                  {[1, 2, 3, 4, 5, 6].map(sem => <option key={sem} value={sem.toString()}>Term {sem}</option>)}
+                   {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => <option key={sem} value={sem.toString()}>Term {sem}</option>)}
                 </select>
               </div>
             </div>
@@ -193,20 +219,6 @@ const StudentModal = ({ student, onSave, onClose }) => {
               </div>
             </div>
 
-             {/* Block Toggle */}
-             <div className="flex items-center justify-between p-4 bg-slate-900 rounded-2xl border border-slate-700/50">
-                <div className="flex items-center gap-3">
-                    <ShieldCheck className={`w-5 h-5 ${formData.isBlocked ? 'text-rose-500' : 'text-slate-500'}`} />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Suspend Access</span>
-                </div>
-                <input
-                    type="checkbox"
-                    name="isBlocked"
-                    checked={formData.isBlocked}
-                    onChange={handleChange}
-                    className="w-5 h-5 rounded border-slate-700 text-indigo-500 bg-slate-900 cursor-pointer"
-                />
-            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-6 border-t border-slate-700/50">

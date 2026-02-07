@@ -177,13 +177,6 @@ export default function LoginPage() {
             <a href="/forgotpass" className="block text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition duration-200">
               Forgot your password?
             </a>
-            
-            <p className="text-sm text-gray-500">
-              Don't have an account?{' '}
-              <a href="/register" className="font-bold text-indigo-600 hover:text-indigo-800 transition duration-200">
-                Register here
-              </a>
-            </p>
           </div>
         </div>
 

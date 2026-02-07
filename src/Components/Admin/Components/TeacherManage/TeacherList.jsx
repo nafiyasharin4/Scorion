@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Filter, Edit2, Trash2, Mail, Phone, BookOpen, GraduationCap, Clock, ShieldAlert } from 'lucide-react';
+import { Search, Filter, Edit2, Trash2, Mail, Phone, BookOpen, GraduationCap, Clock, ShieldAlert, UserCheck, UserX } from 'lucide-react';
 
-const TeacherList = ({ teachers, onEdit, onDelete, loading }) => {
+const TeacherList = ({ teachers, onEdit, onToggleBlock, loading }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
@@ -155,11 +155,15 @@ const TeacherList = ({ teachers, onEdit, onDelete, loading }) => {
                         <Edit2 className="w-4.5 h-4.5" />
                       </button>
                       <button
-                        onClick={() => onDelete(teacher._id)}
-                        className="p-2.5 bg-slate-900 border border-slate-700 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 rounded-xl transition-all shadow-sm"
-                        title="Remove Access"
+                        onClick={() => onToggleBlock(teacher)}
+                        className={`p-2.5 bg-slate-900 border border-slate-700 rounded-xl transition-all shadow-sm group/btn ${
+                          teacher.isBlocked 
+                            ? 'text-emerald-400 hover:text-emerald-300 hover:border-emerald-500/50' 
+                            : 'text-rose-400 hover:text-rose-300 hover:border-rose-500/50'
+                        }`}
+                        title={teacher.isBlocked ? "Authorize Access" : "Suspend Access"}
                       >
-                        <Trash2 className="w-4.5 h-4.5" />
+                        {teacher.isBlocked ? <UserCheck className="w-4.5 h-4.5" /> : <UserX className="w-4.5 h-4.5" />}
                       </button>
                     </div>
                   </td>

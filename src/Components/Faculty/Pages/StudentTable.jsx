@@ -86,13 +86,6 @@ function TeacherStuendtTable() {
     }
   };
 
-  const handleDeleteStudent = (studentId) => {
-    if (window.confirm('Are you sure you want to delete this student?')) {
-      // Local delete for now
-      setStudents(students.filter(student => student.id !== studentId));
-      toast.success('Student record removed');
-    }
-  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -186,7 +179,6 @@ function TeacherStuendtTable() {
           <StudentListTable
             students={students}
             onEdit={handleEditStudent}
-            onDelete={handleDeleteStudent}
             onAddNotes={handleAddNotes}
           />
         </div>

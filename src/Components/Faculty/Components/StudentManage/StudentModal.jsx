@@ -6,6 +6,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
     email: '',
     phone: '',
     course: '',
+    department: '',
     semester: '1',
     status: 'active',
     enrollmentDate: new Date().toISOString().split('T')[0]
@@ -20,6 +21,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
         email: student.email || '',
         phone: student.phone || '',
         course: student.course || '',
+        department: student.department || '',
         semester: student.semester || '1',
         status: student.status || 'active',
         enrollmentDate: student.enrollmentDate ? student.enrollmentDate.split('T')[0] : new Date().toISOString().split('T')[0]
@@ -44,6 +46,10 @@ const StudentModal = ({ student, onSave, onClose }) => {
       newErrors.course = 'Course required';
     }
 
+    if (!formData.department.trim()) {
+      newErrors.department = 'Department required';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -64,20 +70,26 @@ const StudentModal = ({ student, onSave, onClose }) => {
   };
 
   const courses = [
-    'BCA (Bachelor of Computer Applications)', 
-    'B.Sc Computer Science', 
-    'B.Sc Information Technology',
-    'B.Voc Software Development',
-    'B.Voc Data Science',
-    'B.Com Computer Application', 
-    'B.Com Finance',
-    'BBA (Bachelor of Business Administration)',
-    'B.Sc Mathematics',
-    'B.Sc Physics',
-    'B.Sc Chemistry',
-    'B.A. English Language & Literature',
-    'B.A. Economics',
-    'B.A. Sociology'
+    'BA English Language and Literature Honours',
+    'BA Economics',
+    'BBA Honours',
+    'BCA Honours',
+    'BSC Physics',
+    'Bcom Co-operation Honours',
+    'Bcom Computer Application',
+    'Bcom Finance',
+    'Mcom Finance',
+    'MA English',
+    'B.Sc. ARTIFICIAL INTELLIGENCE (HONOURS)'
+  ];
+
+  const departments = [
+    'Computer Science',
+    'Commerce',
+    'Business Administration',
+    'Physics',
+    'Arts & Humanities',
+    'AI'
   ];
 
   return (
@@ -147,9 +159,25 @@ const StudentModal = ({ student, onSave, onClose }) => {
               />
             </div>
 
+            {/* Department */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Department</label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
+              >
+                <option value="">Select Department</option>
+                {departments.map(dept => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Course */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Stream</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Program</label>
               <select
                 name="course"
                 value={formData.course}
@@ -172,7 +200,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
                 onChange={handleChange}
                 className="w-full px-5 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:ring-1 focus:ring-cyan-500 transition-all font-bold"
               >
-                {[1, 2, 3, 4, 5, 6].map(sem => (
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
                   <option key={sem} value={sem.toString()}>Phase {sem}</option>
                 ))}
               </select>

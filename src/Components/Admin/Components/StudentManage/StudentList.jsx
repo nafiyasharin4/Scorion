@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Search, Edit2, Trash2, Mail, Phone, BookOpen, GraduationCap, Clock, ShieldAlert, User, Database } from 'lucide-react';
+import { Search, Edit2, Trash2, Mail, Phone, BookOpen, GraduationCap, Clock, ShieldAlert, User, Database, UserCheck, UserX } from 'lucide-react';
 
-const StudentList = ({ students, onEdit, onDelete, loading }) => {
+const StudentList = ({ students, onEdit, onToggleBlock, loading }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [courseFilter, setCourseFilter] = useState('all');
+  const [deptFilter, setDeptFilter] = useState('all');
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = 
@@ -17,8 +18,9 @@ const StudentList = ({ students, onEdit, onDelete, loading }) => {
                          (statusFilter === 'blocked' && isBlocked);
                          
     const matchesCourse = courseFilter === 'all' || student.course === courseFilter;
+    const matchesDept = deptFilter === 'all' || student.department === deptFilter;
     
-    return matchesSearch && matchesStatus && matchesCourse;
+    return matchesSearch && matchesStatus && matchesCourse && matchesDept;
   });
 
   const getStatusBadge = (isBlocked) => {
@@ -39,6 +41,7 @@ const StudentList = ({ students, onEdit, onDelete, loading }) => {
   };
 
   const courses = [...new Set(students.map(s => s.course))].filter(Boolean);
+  const departments = [...new Set(students.map(s => s.department))].filter(Boolean);
 
   if (loading) {
     return (
@@ -74,6 +77,15 @@ const StudentList = ({ students, onEdit, onDelete, loading }) => {
               <option value="all">Access: All</option>
               <option value="active">Access: Authorized</option>
               <option value="blocked">Access: Denied</option>
+            </select>
+
+            <select
+              value={deptFilter}
+              onChange={(e) => setDeptFilter(e.target.value)}
+              className="px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500 font-black text-[10px] uppercase tracking-widest cursor-pointer hover:bg-slate-800 transition-colors"
+            >
+              <option value="all">Dept: All</option>
+              {departments.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
             
             <select
@@ -130,6 +142,7 @@ const StudentList = ({ students, onEdit, onDelete, loading }) => {
                   </td>
                   <td className="px-6 py-6 whitespace-nowrap">
                     <div className="text-sm font-bold text-slate-300">{student.course}</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{student.department}</div>
                     <div className="text-[10px] text-indigo-400/80 font-black mt-1 uppercase tracking-widest">Semester {student.semester}</div>
                   </td>
                   <td className="px-6 py-6 whitespace-nowrap">
@@ -148,14 +161,20 @@ const StudentList = ({ students, onEdit, onDelete, loading }) => {
                       <button
                         onClick={() => onEdit(student)}
                         className="p-2.5 bg-slate-900 border border-slate-700 text-slate-500 hover:text-indigo-400 hover:border-indigo-500/50 rounded-xl transition-all"
+                        title="Edit Profile"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onDelete(student._id)}
-                        className="p-2.5 bg-slate-900 border border-slate-700 text-slate-500 hover:text-rose-400 hover:border-rose-500/50 rounded-xl transition-all"
+                        onClick={() => onToggleBlock(student)}
+                        className={`p-2.5 bg-slate-900 border border-slate-700 rounded-xl transition-all ${
+                          student.isBlocked 
+                            ? 'text-emerald-500 hover:text-emerald-400 hover:border-emerald-500/50' 
+                            : 'text-rose-500 hover:text-rose-400 hover:border-rose-500/50'
+                        }`}
+                        title={student.isBlocked ? "Authorize Access" : "Suspend Access"}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        {student.isBlocked ? <UserCheck className="w-4 h-4" /> : <UserX className="w-4 h-4" />}
                       </button>
                     </div>
                   </td>

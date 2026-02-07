@@ -105,6 +105,26 @@ export default function SyllabusPage() {
         { name: 'Project Work', code: 'BCS6B15', credits: 6, difficulty: 'High', color: 'text-blue-600', bg: 'bg-blue-50' },
         { name: 'Viva-Voce', code: 'BCS6B16', credits: 2, difficulty: 'Medium', color: 'text-amber-500', bg: 'bg-amber-50' }
       ]
+    },
+    '7': {
+      title: 'Advanced Specialization',
+      description: 'Research methodology and emerging technological artifacts',
+      subjects: [
+        { name: 'BCA Core 7-A', code: 'BCS7B17', credits: 4, difficulty: 'Hard', color: 'text-indigo-500', bg: 'bg-indigo-50' },
+        { name: 'Elective I', code: 'BCS7E01', credits: 3, difficulty: 'Medium', color: 'text-emerald-500', bg: 'bg-emerald-50' },
+        { name: 'Project Phase I', code: 'BCS7B18', credits: 4, difficulty: 'High', color: 'text-rose-500', bg: 'bg-rose-50' },
+        { name: 'Research Methods', code: 'BCS7B19', credits: 3, difficulty: 'Medium', color: 'text-blue-500', bg: 'bg-blue-50' }
+      ]
+    },
+    '8': {
+      title: 'Capstone Phase',
+      description: 'Final industry integration and professional synthesis',
+      subjects: [
+        { name: 'BCA Core 8-A', code: 'BCS8B20', credits: 4, difficulty: 'Hard', color: 'text-rose-500', bg: 'bg-rose-50' },
+        { name: 'Elective II', code: 'BCS8E02', credits: 3, difficulty: 'Medium', color: 'text-indigo-500', bg: 'bg-indigo-50' },
+        { name: 'Final Internship', code: 'BCS8B21', credits: 8, difficulty: 'High', color: 'text-blue-600', bg: 'bg-blue-50' },
+        { name: 'Grand Viva', code: 'BCS8B22', credits: 2, difficulty: 'Medium', color: 'text-amber-500', bg: 'bg-amber-50' }
+      ]
     }
   };
 
@@ -298,14 +318,24 @@ export default function SyllabusPage() {
                       {subject.name}
                     </h3>
 
-                    <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp size={14} className="text-indigo-500" />
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{subject.credits} Credits</span>
+                    <div className="pt-6 border-t border-slate-50 flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp size={14} className="text-indigo-500" />
+                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{subject.credits} Credits</span>
+                        </div>
+                        <div className="flex gap-2">
+                           <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">INT: {subject.internalMarks || 30}</span>
+                           <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">EXT: {subject.externalMarks || 70}</span>
+                        </div>
                       </div>
-                      <button className="text-indigo-600 hover:text-indigo-700 transition-colors">
-                        <ChevronRight size={20} />
-                      </button>
+                      
+                      <div className="flex items-center justify-between">
+                         <span className="text-[10px] font-black text-indigo-600">Total: {subject.totalMarks || 100} Marks</span>
+                         <button className="text-indigo-600 hover:text-indigo-700 transition-colors">
+                            <ChevronRight size={20} />
+                         </button>
+                      </div>
                     </div>
                   </div>
                 </div>
