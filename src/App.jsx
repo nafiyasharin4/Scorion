@@ -104,6 +104,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<GradePredictionLanding />} />
         <Route path="/login" element={<Loginpage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         <Route path="/userprofile" element={<StudentProfile />} />
         <Route path="/home" element={<HomePage />} />

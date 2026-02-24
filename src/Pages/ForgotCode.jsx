@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, ArrowLeft, Shield } from 'lucide-react';
+import { Mail, ArrowLeft, Shield, Loader2 } from 'lucide-react';
 import { useNavigate ,useLocation} from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -151,25 +151,29 @@ export default function OTPVerification() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md my-10">
         
         <div className="text-center mb-8">
-          <div className="inline-block bg-indigo-600 text-white rounded-full p-3 mb-4">
-            <Shield className="w-8 h-8" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4 shadow-xl ring-4 ring-indigo-50">
+            <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Verify OTP</h1>
-          <p className="text-gray-600">Enter the code sent to your email</p>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">SCORION</h1>
+          <p className="text-gray-600 font-medium text-sm">Join the next generation of academic intelligence</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-
-          <div id="resend-success" className="hidden mb-4 bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-700 text-center">
-            OTP resent successfully!
+        <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 border border-gray-100 transition-all">
+          <div className="mb-6">
+            <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-1">Verification Protocol</p>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Otp Validation</h2>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
-              Enter 6-Digit OTP
+          <div id="resend-success" className="hidden mb-4 bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-[10px] font-black text-emerald-700 text-center uppercase tracking-widest">
+            Protocol sequence resent successfully
+          </div>
+
+          <div className="mb-8">
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 ml-1 text-center">
+              Security Access Code (6 digits)
             </label>
             <div className="flex gap-2 sm:gap-3 justify-center" onPaste={handlePaste}>
               {otp.map((digit, index) => (
@@ -182,26 +186,25 @@ export default function OTPVerification() {
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  className={`w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 ${
-                    error ? 'border-red-500' : 'border-gray-300'
-                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all`}
+                  className={`w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-black border rounded-2xl outline-none transition-all ${
+                    error ? 'border-rose-500 bg-rose-50 text-rose-600' : 'border-slate-100 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 text-slate-700'
+                  }`}
                 />
               ))}
             </div>
-            {error && <p className="mt-3 text-sm text-red-600 text-center">{error}</p>}
+            {error && <p className="mt-3 text-[10px] font-black text-rose-500 text-center uppercase tracking-widest">{error}</p>}
           </div>
 
-          <div className="mb-6 text-center">
-            <p className="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
+          <div className="mb-8 text-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
             {countdown > 0 ? (
-              <p className="text-sm font-semibold text-indigo-600">Resend OTP in {countdown} seconds</p>
+              <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Next otp in {countdown}s</p>
             ) : (
               <button
                 onClick={handleResendOTP}
                 disabled={isLoading}
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 underline disabled:opacity-50"
+                className="text-[10px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-[0.2em] underline disabled:opacity-50"
               >
-                Resend OTP
+                Resend otp
               </button>
             )}
           </div>
@@ -209,17 +212,24 @@ export default function OTPVerification() {
           <button
             onClick={handleVerifyOTP}
             disabled={isLoading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50 mb-4"
+            className="w-full px-6 py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-indigo-500/20 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center mb-4"
           >
-            {isLoading ? "Verifying..." : "Verify OTP"}
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-3 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              'Verify Identity'
+            )}
           </button>
 
           <button
             onClick={handleBackToEmail}
-            className="w-full text-indigo-600 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition flex items-center justify-center gap-2"
+            className="w-full py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-indigo-600 transition-all flex items-center justify-center gap-2"
           >
-            <ArrowLeft className="w-5 h-5" />
-            Change Email Address
+            <ArrowLeft className="w-4 h-4" />
+            Modify Email Address
           </button>
 
         </div>

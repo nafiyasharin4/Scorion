@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Mail, Phone, Lock, Loader2, ShieldCheck } from 'lucide-react';
+import { User, Mail, Phone, Lock, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -7,11 +7,13 @@ import toast from 'react-hot-toast';
 export default function RegisterPage() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
         password: '',
+        confirmPassword: '',
         department: '',
         course: '',
         termsAccepted: false
@@ -57,7 +59,7 @@ export default function RegisterPage() {
             setFormData({ 
                 ...formData, 
                 department: value,
-                course: '' // Reset course when department changes
+                course: '' 
             });
         } else {
             setFormData({ 
@@ -88,6 +90,9 @@ export default function RegisterPage() {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 8) {
             newErrors.password = 'Password must be at least 8 characters';
+        }
+        if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
         }
         if (!formData.department) newErrors.department = 'Department is required';
         if (!formData.course) newErrors.course = 'Course is required';
@@ -253,25 +258,54 @@ export default function RegisterPage() {
                                     </div>
                                     {errors.phone && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.phone}</p>}
                                 </div>
+                            </div>
 
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
-                                        Security Key
+                                        Password
                                     </label>
                                     <div className="relative group">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
                                             <Lock className="w-4 h-4" />
                                         </div>
                                         <input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             name="password"
                                             value={formData.password}
                                             onChange={handleChange}
-                                            className={`w-full pl-11 pr-4 py-3.5 bg-slate-50 border rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all ${errors.password ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
+                                            className={`w-full pl-11 pr-12 py-3.5 bg-slate-50 border rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all ${errors.password ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
+                                            placeholder="••••••••"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                    {errors.password && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.password}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                        Confirm Password
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                            <Lock className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            name="confirmPassword"
+                                            value={formData.confirmPassword}
+                                            onChange={handleChange}
+                                            className={`w-full pl-11 pr-12 py-3.5 bg-slate-50 border rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all ${errors.confirmPassword ? 'border-rose-500 bg-rose-50' : 'border-slate-100 focus:bg-white focus:ring-2 focus:ring-indigo-500/20'}`}
                                             placeholder="••••••••"
                                         />
                                     </div>
-                                    {errors.password && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.password}</p>}
+                                    {errors.confirmPassword && <p className="text-rose-500 text-[10px] font-black mt-1 ml-1 uppercase">{errors.confirmPassword}</p>}
                                 </div>
                             </div>
 
@@ -303,7 +337,7 @@ export default function RegisterPage() {
                                         Processing...
                                     </>
                                 ) : (
-                                    'Initialize Protocol'
+                                    'Register'
                                 )}
                             </button>
                         </div>
@@ -316,9 +350,6 @@ export default function RegisterPage() {
                     <a href="/login" className="text-indigo-600 hover:text-indigo-800 font-bold underline transition-colors">
                         Sign In
                     </a>
-                </p>
-                <p className="mt-4 text-center text-xs text-gray-400 font-medium">
-                    Are you a Super Admin? <a href="/admin/login" className="text-gray-500 hover:text-indigo-600 underline">Login here</a>
                 </p>
             </div>
         </div>

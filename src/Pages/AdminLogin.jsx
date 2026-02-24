@@ -126,7 +126,7 @@ export default function AdminLogin() {
               {loading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
-                'Initialize Session'
+                'Login'
               )}
             </button>
           </form>

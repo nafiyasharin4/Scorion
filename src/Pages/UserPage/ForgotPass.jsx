@@ -39,11 +39,11 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo/Title */}
+      <div className="w-full max-w-md my-10">
+        {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-block bg-indigo-600 text-white rounded-full p-3 mb-4">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4 shadow-xl ring-4 ring-indigo-50">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -52,26 +52,24 @@ export default function ForgotPassword() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">SCORION</h1>
-          <p className="text-gray-600">Reset your password</p>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">SCORION</h1>
+          <p className="text-gray-600 font-medium text-sm">Join the next generation of academic intelligence</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 border border-gray-100 transition-all">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Forgot Password?</h2>
-            <p className="text-gray-600 text-sm">
-              Enter your email address and we'll send you an OTP to reset your password.
-            </p>
+            <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-1">Recovery Protocol</p>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Initiate Recovery</h2>
           </div>
 
-          <div className="mb-6">
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-              Email Address
+          <div className="mb-8">
+            <label htmlFor="email" className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+              Communication Node
             </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                <Mail className="w-4 h-4" />
               </div>
               <input
                 type="email"
@@ -79,8 +77,8 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendOTP()}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                placeholder="student@example.com"
+                className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
+                placeholder="email@example.com"
               />
             </div>
           </div>
@@ -88,16 +86,24 @@ export default function ForgotPassword() {
           <button
             onClick={handleSendOTP}
             disabled={isLoading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+            className="w-full px-6 py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-indigo-500/20 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center mb-6"
           >
-            {isLoading ? 'Sending OTP...' : 'Send OTP'}
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-3 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              'Initialize Protocol'
+            )}
           </button>
 
           <button
             onClick={handleBackToLogin}
-            className="w-full text-indigo-600 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors duration-200 flex items-center justify-center gap-2"
+            className="w-full py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-indigo-600 transition-all flex items-center justify-center gap-2"
           >
-            <ArrowLeft className="w-5 h-5" /> Back to Login
+            <ArrowLeft className="w-4 h-4" />
+            Abort & Return
           </button>
         </div>
       </div>

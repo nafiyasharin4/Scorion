@@ -67,13 +67,13 @@ const GradePredictionLanding = () => {
               onClick={() => navigate('/login')}
               className="px-6 py-2.5 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-indigo-600 transition-colors"
             >
-              Access Identity
+              sign in
             </button>
             <button 
               onClick={handleStart}
               className="px-6 py-2.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-indigo-600 transition-all hover:shadow-xl hover:shadow-indigo-100 active:scale-95"
             >
-              Initialize Node
+              get started
             </button>
           </div>
         </div>
@@ -213,7 +213,7 @@ const GradePredictionLanding = () => {
               { 
                 icon: <Cpu className="w-8 h-8" />, 
                 title: 'Neural Core', 
-                desc: 'Proprietary machine learning models trained on 10M+ academic data points for unmatched precision.' 
+                desc: 'notification systems provide real time notification with high accuracy' 
               },
               { 
                 icon: <Network className="w-8 h-8" />, 
