@@ -65,7 +65,7 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
               <select
                 value={courseFilter}
                 onChange={(e) => setCourseFilter(e.target.value)}
-                className="px-6 py-3.5 bg-slate-950 border border-slate-700 rounded-2xl text-slate-400 outline-none focus:ring-2 focus:ring-cyan-500 font-black text-[10px] uppercase tracking-widest cursor-pointer hover:bg-slate-900 transition-colors"
+                className="px-6 py-3.5 bg-slate-950 border border-slate-700 rounded-2xl text-slate-400 outline-none focus:ring-2 focus:ring-cyan-500 font-black text-xs uppercase tracking-widest cursor-pointer hover:bg-slate-900 transition-colors"
               >
                 <option value="all">Domain: All</option>
                 {courses.map(course => (
@@ -99,15 +99,15 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
                     <div>
                       <h3 className="text-lg font-black text-white group-hover/row:text-cyan-400 transition-colors">{student.name}</h3>
                       <div className="flex items-center gap-3 mt-1">
-                         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{student.course}</span>
+                         <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">{student.course}</span>
                          <div className="w-1 h-1 rounded-full bg-slate-700"></div>
-                         <span className="text-[10px] text-cyan-500/80 font-black uppercase tracking-widest">Semester {student.semester}</span>
+                         <span className="text-xs text-cyan-500/80 font-black uppercase tracking-widest">Semester {student.semester}</span>
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => onAddMarks(student)}
-                    className="flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 text-[10px] uppercase tracking-widest"
+                    className="flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 text-xs uppercase tracking-widest"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -124,7 +124,7 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
                     return (
                       <div key={semester} className={`rounded-2xl p-5 border transition-all ${semMarks ? 'bg-slate-900 border-slate-700/50 hover:border-slate-500/50 shadow-lg' : 'bg-slate-950/30 border-slate-800/50 border-dashed'}`}>
                         <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Semester {semester}</h4>
+                          <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Semester {semester}</h4>
                           {semMarks ? (
                             <div className="flex gap-2">
                               <button
@@ -145,10 +145,10 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
                               </button>
                             </div>
                           ) : (
-                            <button
-                               onClick={() => onAddMarks(student, semester.toString())}
-                               className="text-[9px] font-black text-cyan-500/60 uppercase tracking-widest hover:text-cyan-400 transition-colors"
-                            >
+                             <button
+                                onClick={() => onAddMarks(student, semester.toString())}
+                                className="text-[11px] font-black text-cyan-500/60 uppercase tracking-widest hover:text-cyan-400 transition-colors"
+                             >
                                Initialize
                             </button>
                           )}
@@ -158,15 +158,15 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
                           <div className="space-y-4">
                             <div className="flex justify-between items-end">
                                <div className="flex-1 min-w-0">
-                                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1">Performance Index: {semMarks.sgpa}</p>
-                                  <p className="text-[10px] font-black text-white uppercase tracking-tight truncate">
+                                   <p className="text-[11px] font-black text-slate-600 uppercase tracking-widest mb-1">Performance Index: {semMarks.sgpa}</p>
+                                  <p className="text-xs font-black text-white uppercase tracking-tight truncate">
                                     {parseFloat(semMarks.sgpa) >= 7.5 ? "First Class with Distinction" :
                                      parseFloat(semMarks.sgpa) >= 5.5 ? "First Class" :
                                      parseFloat(semMarks.sgpa) >= 4.5 ? "Second Class" :
                                      parseFloat(semMarks.sgpa) >= 3.5 ? "Third Class" : "Fail"}
                                   </p>
                                </div>
-                               <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getGradeColor(semMarks.totalGrade)}`}>
+                                <span className={`px-2 py-1 rounded-lg text-xs font-black uppercase tracking-widest border ${getGradeColor(semMarks.totalGrade)}`}>
                                  {semMarks.totalGrade}
                                </span>
                             </div>
@@ -174,8 +174,8 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
                             <div className="pt-4 border-t border-slate-800 space-y-2">
                               {semMarks.subjects.map((subject, index) => (
                                 <div key={index} className="flex justify-between items-center group/sub">
-                                  <span className="text-[10px] font-bold text-slate-400 truncate pr-2 group-hover/sub:text-slate-300 transition-colors">{subject.name}</span>
-                                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-black border ${getGradeColor(subject.grade)}`}>
+                                  <span className="text-xs font-bold text-slate-400 truncate pr-2 group-hover/sub:text-slate-300 transition-colors">{subject.name}</span>
+                                  <span className={`px-1.5 py-0.5 rounded text-[11px] font-black border ${getGradeColor(subject.grade)}`}>
                                     {subject.grade}
                                   </span>
                                 </div>
@@ -199,7 +199,7 @@ const StudentMarkList = ({ students, onAddMarks, onDeleteMarks }) => {
 
       {/* Footer */}
       <div className="px-8 py-5 border-t border-slate-700/50 bg-slate-900/40">
-        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+        <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
            System Registry Integrity: <span className="text-slate-300">{filteredStudents.length}</span> / {students.length} STUDENT ENTRIES
         </p>
       </div>

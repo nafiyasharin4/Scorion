@@ -200,14 +200,14 @@ export default function Profile() {
                        <div className="bg-blue-50 p-3.5 rounded-2xl border border-blue-100 shadow-sm">
                           {isTeacher ? <Book className="w-6 h-6 text-blue-600" /> : <Layers className="w-6 h-6 text-blue-600" />}
                        </div>
-                       <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
-                            {isTeacher ? 'Core Specialization' : 'Active Academic Phase'}
-                          </p>
-                          <p className="text-xl font-black text-slate-900 tracking-tight">
-                            {isTeacher ? (profile.subject || 'Core Engineering') : `Semester ${profile.semester || 'PENDING'}`}
-                          </p>
-                       </div>
+                        <div>
+                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                             {isTeacher ? 'Core Specialization' : 'Active Academic Phase'}
+                           </p>
+                           <p className="text-xl font-black text-slate-900 tracking-tight">
+                             {isTeacher ? (profile.subject || 'Faculty') : `Semester ${profile.semester || '1'}`}
+                           </p>
+                        </div>
                     </div>
 
                     {!isTeacher && (
@@ -243,7 +243,7 @@ export default function Profile() {
                        </div>
                        <div>
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">System Identifier</p>
-                          <p className="text-base font-black text-amber-600/80 font-mono tracking-widest uppercase">#{profile._id?.substring(profile._id.length - 8)}</p>
+                          <p className="text-base font-black text-amber-600/80 font-mono tracking-widest uppercase">SCR-{profile._id?.substring(profile._id.length - 8) || 'UNIT-X'}</p>
                        </div>
                     </div>
                   </div>

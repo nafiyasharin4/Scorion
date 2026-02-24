@@ -82,13 +82,15 @@ const GradePredictionResult = () => {
                      <Activity className="text-indigo-600 w-7 h-7" />
                   </div>
                   <div>
-                    <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">Academic <span className="text-indigo-600">Intelligence</span></h1>
+                    <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">Academic <span className="text-indigo-600">{location.state?.isForecast ? 'Forecast' : 'Intelligence'}</span></h1>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="px-4 py-1.5 bg-indigo-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/30">
                         Semester {selectedSemesterData.semester}
                       </span>
                       <ShieldCheck className="text-emerald-500 w-4 h-4" />
-                      <span className="text-slate-400 font-black uppercase tracking-[0.3em] text-[9px]">Prediction Registry</span>
+                      <span className="text-slate-400 font-black uppercase tracking-[0.3em] text-[9px]">
+                         {location.state?.isForecast ? 'Semester Prediction Registry' : 'Semester Academic Registry'}
+                      </span>
                     </div>
                   </div>
                </div>

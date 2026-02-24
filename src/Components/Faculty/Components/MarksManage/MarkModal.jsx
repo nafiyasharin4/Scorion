@@ -233,7 +233,7 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
             <h2 className="text-xl font-black text-white uppercase tracking-tight">
               {student && semester && student.marks?.[semester] ? 'Edit Academic Entry' : 'New Academic Entry'}
             </h2>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-1">
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mt-1">
               {student?.name} • Semester {formData.semester || '??'}
             </p>
           </div>
@@ -252,7 +252,7 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
           {/* Main Info */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Semester (Max 6)</label>
+              <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Semester (Max 6)</label>
               <select
                 value={formData.semester}
                 onChange={(e) => setFormData({...formData, semester: e.target.value})}
@@ -263,11 +263,11 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
                   <option key={sem} value={sem.toString()}>Semester {sem}</option>
                 ))}
               </select>
-              {errors.semester && <p className="text-[10px] text-rose-500 font-black ml-1 uppercase">{errors.semester}</p>}
+              {errors.semester && <p className="text-xs text-rose-500 font-black ml-1 uppercase">{errors.semester}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Attendance (%)</label>
+              <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Attendance (%)</label>
               <input
                 type="number"
                 value={formData.attendancePercentage}
@@ -275,7 +275,7 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
                 placeholder="0-100"
                 className="w-full px-5 py-4 bg-slate-950 border border-slate-700 rounded-2xl text-white outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-bold text-xs"
               />
-              {errors.attendance && <p className="text-[10px] text-rose-500 font-black ml-1 uppercase">{errors.attendance}</p>}
+              {errors.attendance && <p className="text-xs text-rose-500 font-black ml-1 uppercase">{errors.attendance}</p>}
             </div>
 
             <div className="bg-cyan-500/5 border border-cyan-500/20 rounded-2xl p-4 flex items-center gap-4">
@@ -283,8 +283,8 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
                 {formData.totalGrade || '??'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest truncate">SGPA: {formData.sgpa}</p>
-                <p className="text-[10px] font-black text-white uppercase tracking-tight truncate mt-0.5">{getClassName(formData.sgpa)}</p>
+                <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest truncate">SGPA: {formData.sgpa}</p>
+                <p className="text-xs font-black text-white uppercase tracking-tight truncate mt-0.5">{getClassName(formData.sgpa)}</p>
               </div>
             </div>
           </div>
@@ -292,13 +292,13 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
           {/* Subjects */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Subject Performance</h3>
+               <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Subject Performance</h3>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={populateSubjects}
                   disabled={!formData.semester || syllabusLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg className={`w-3 h-3 ${syllabusLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {syllabusLoading ? (
@@ -312,7 +312,7 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
                 <button
                   type="button"
                   onClick={addSubject}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-slate-700"
+                   className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-slate-700"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -341,12 +341,12 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
                       value={subject.marks}
                       onChange={(e) => handleSubjectChange(index, 'marks', e.target.value)}
                       placeholder="Mark"
-                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1 text-[10px] font-black text-white uppercase tracking-widest outline-none focus:ring-1 focus:ring-cyan-500"
+                       className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1 text-xs font-black text-white uppercase tracking-widest outline-none focus:ring-1 focus:ring-cyan-500"
                     />
                   </div>
 
                   <div className="md:col-span-3 flex items-center px-4 bg-slate-900 border border-slate-800 rounded-xl">
-                    <span className="text-[10px] font-black text-cyan-500 uppercase tracking-widest">
+                     <span className="text-xs font-black text-cyan-500 uppercase tracking-widest">
                       Grade: {subject.grade || '---'}
                     </span>
                   </div>
@@ -369,16 +369,16 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
 
           {/* Action Buttons */}
           <div className="flex gap-4 pt-4 border-t border-slate-800">
-            <button
+             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-4 bg-slate-950 border border-slate-800 text-slate-500 hover:text-white font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
+              className="flex-1 px-6 py-4 bg-slate-950 border border-slate-800 text-slate-500 hover:text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-[2] px-6 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95"
+              className="flex-[2] px-6 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95"
             >
               Commit Marks & Attendance
             </button>

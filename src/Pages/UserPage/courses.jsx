@@ -130,7 +130,7 @@ export default function SyllabusPage() {
 
   useEffect(() => {
     syncSyllabus();
-  }, [activeSemester]);
+  }, [activeSemester, profile]);
 
   const syncSyllabus = async () => {
     setLoading(true);
@@ -139,19 +139,27 @@ export default function SyllabusPage() {
       const response = await axios.get(`http://localhost:5000/api/user/syllabus/${activeSemester}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (response.data) {
+      
+      if (response.data && response.data.subjects && response.data.subjects.length > 0) {
         setCurriculumData(response.data);
-      } else {
+      } else if (profile?.course?.includes('BCA')) {
         setCurriculumData(LOCAL_CURRICULUM[activeSemester]);
+      } else {
+        setCurriculumData(null);
       }
     } catch (error) {
-      setCurriculumData(LOCAL_CURRICULUM[activeSemester]);
+      console.error('Syllabus sync failed', error);
+      if (profile?.course?.includes('BCA')) {
+        setCurriculumData(LOCAL_CURRICULUM[activeSemester]);
+      } else {
+        setCurriculumData(null);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const currentSem = curriculumData || LOCAL_CURRICULUM[activeSemester];
+  const currentSem = curriculumData || (profile?.course?.includes('BCA') ? LOCAL_CURRICULUM[activeSemester] : null);
   const filteredSubjects = currentSem?.subjects?.filter(s => 
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     s.code.toLowerCase().includes(searchQuery.toLowerCase())

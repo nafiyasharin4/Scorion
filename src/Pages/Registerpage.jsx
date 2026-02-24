@@ -23,32 +23,34 @@ export default function RegisterPage() {
     // Calicut University Mapping
     const DEPARTMENTS = {
         'Computer Science': [
-            'BCA (Bachelor of Computer Applications)',
+            'BCA Honours',
             'BSc Computer Science',
             'BSc Information Technology',
             'MSc Computer Science',
             'MCA (Master of Computer Applications)'
         ],
         'Commerce': [
-            'BCom Finance',
-            'BCom Computer Application',
-            'BCom Cooperation',
-            'MCom Finance',
-            'BBA (Bachelor of Business Administration)'
+            'Bcom Finance',
+            'Bcom Computer Application',
+            'Bcom Co-operation Honours',
+            'Mcom Finance'
         ],
-        'Science': [
-            'BSc Physics',
-            'BSc Mathematics',
-            'BSc Chemistry',
-            'BSc Zoology',
-            'BSc Botany'
+        'Business Administration': [
+            'BBA Honours'
+        ],
+        'Physics': [
+            'BSC Physics'
         ],
         'Arts & Humanities': [
-            'BA English',
+            'BA English Language and Literature Honours',
             'BA Economics',
+            'MA English',
             'BA Malayalam',
             'BA Sociology',
             'BA History'
+        ],
+        'AI': [
+            'B.Sc. ARTIFICIAL INTELLIGENCE (HONOURS)'
         ]
     };
 

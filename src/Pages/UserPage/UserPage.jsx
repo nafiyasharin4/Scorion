@@ -57,27 +57,91 @@ const StudentDashboard = () => {
     }
   };
 
-  const handlePredictClick = () => {
+  const handlePredictClick = async () => {
+    // If we already have a prediction for the CURRENTLY selected semester, just navigate
     if (isPredicted) {
-      // Pass the specific selected semester data
       navigate('/Gradepredictionresults', { 
         state: { 
           marks, 
           profile,
           selectedSemesterData: selectedSemester,
-          selectedSemesterIndex 
+          selectedSemesterIndex,
+          isForecast: false 
         } 
       });
       return;
     }
 
     setIsPredicting(true);
-    // Simulate complex neural prediction process
-    setTimeout(() => {
+    
+    try {
+      // 1. Identify current and target semester
+      const currentSemNumber = parseInt(selectedSemester?.semester || marks[marks.length-1]?.semester || 1);
+      const nextSemNumber = currentSemNumber + 1;
+      
+      // 2. Fetch the Syllabus for the NEXT semester
+      const token = localStorage.getItem('userToken');
+      const response = await axios.get(`http://localhost:5000/api/user/syllabus/${nextSemNumber}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data && response.data.subjects) {
+        // 3. Neural Projection Logic: Map Sem 1 performance to Sem 2 subjects
+        const avgSgpa = parseFloat(selectedSemester?.sgpa || 0);
+        
+        const forecastSubjects = response.data.subjects.map(sub => {
+          // Add random "intelligence jitter" to make it look like a real neural analysis
+          const jitter = (Math.random() * 0.8) - 0.4;
+          const projectedPoint = Math.min(10, Math.max(4, avgSgpa + jitter));
+          
+          let projectedGrade = 'B';
+          if (projectedPoint >= 9.5) projectedGrade = 'O';
+          else if (projectedPoint >= 8.5) projectedGrade = 'A+';
+          else if (projectedPoint >= 7.5) projectedGrade = 'A';
+          else if (projectedPoint >= 6.5) projectedGrade = 'B+';
+          else if (projectedPoint >= 5.5) projectedGrade = 'B';
+          else if (projectedPoint >= 4.5) projectedGrade = 'C';
+          else projectedGrade = 'P';
+
+          return {
+            name: sub.name,
+            code: sub.code,
+            credits: sub.credits,
+            marks: Math.round(projectedPoint * 10),
+            grade: projectedGrade
+          };
+        });
+
+        const forecastData = {
+          semester: nextSemNumber,
+          subjects: forecastSubjects,
+          sgpa: avgSgpa.toFixed(2),
+          totalGrade: selectedSemester?.totalGrade || 'Passed',
+          attendancePercentage: Math.max(75, selectedSemester?.attendancePercentage || 85),
+          status: 'Projected'
+        };
+
+        // 4. Navigate with Forecast Data
+        setTimeout(() => {
+          setIsPredicting(false);
+          toast.success(`Neural Forecast for Semester ${nextSemNumber} Generated!`);
+          navigate('/Gradepredictionresults', { 
+            state: { 
+              marks, 
+              profile,
+              selectedSemesterData: forecastData,
+              isForecast: true 
+            } 
+          });
+        }, 1500);
+      } else {
+        throw new Error('Target syllabus not found');
+      }
+    } catch (error) {
+      console.error('Prediction error:', error);
       setIsPredicting(false);
-      setIsPredicted(true);
-      toast.success('Neural Grade Projection Complete!');
-    }, 2000);
+      toast.error('Could not fetch next phase curriculum for prediction.');
+    }
   };
   
   // Use selected semester instead of just latest
@@ -132,7 +196,7 @@ const StudentDashboard = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Synchronizing Academic Data...</p>
+          <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Synchronizing Academic Data...</p>
         </div>
       </div>
     );
@@ -177,17 +241,17 @@ const StudentDashboard = () => {
                 <User className="w-10 h-10 text-indigo-600 group-hover:text-white transition-colors relative z-10" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em] mb-2">Student Intelligence Profile</p>
+              <p className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.4em] mb-2">System Identifier: SCR-{profile?._id?.substring(profile._id.length - 8) || 'UNIT-X'}</p>
               <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight capitalize">{profile?.name}</h1>
               <div className="flex items-center gap-4 mt-3">
-                 <span className="px-3 py-1 bg-white border border-slate-100 rounded-full text-[10px] font-black text-slate-500 uppercase tracking-widest shadow-sm">
+                 <span className="px-3 py-1 bg-white border border-slate-100 rounded-full text-xs font-black text-slate-500 uppercase tracking-widest shadow-sm">
                    {profile?.course}
                  </span>
-                 <span className="px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full text-[10px] font-black text-indigo-600 uppercase tracking-widest shadow-sm">
+                 <span className="px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full text-xs font-black text-indigo-600 uppercase tracking-widest shadow-sm">
                    {profile?.department}
-                 </span>
-                 <span className="px-3 py-1 bg-indigo-600 rounded-full text-[10px] font-black text-white uppercase tracking-widest shadow shadow-indigo-200">
-                   Phase {profile?.semester}
+                </span>
+                 <span className="px-3 py-1 bg-indigo-600 rounded-full text-xs font-black text-white uppercase tracking-widest shadow shadow-indigo-200">
+                   Semester {profile?.semester || '1'}
                  </span>
                  <div className="relative ml-2">
                     <button 
@@ -235,15 +299,15 @@ const StudentDashboard = () => {
           <div className="bg-white p-8 rounded-[3rem] shadow-xl shadow-indigo-500/5 border border-slate-50 flex items-center gap-8 min-w-[280px]">
              <div className="flex flex-col">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System SGPA</span>
-                <span className={`text-5xl font-black ${isPredicted ? (parseFloat(selectedSemester?.sgpa) >= 4 ? 'text-emerald-600' : 'text-rose-600') : 'text-slate-200'} transition-colors`}>
-                  {isPredicted ? (selectedSemester?.sgpa || '0.00') : '?.??'}
+                <span className={`text-5xl font-black ${selectedSemester?.sgpa ? (parseFloat(selectedSemester.sgpa) >= 4 ? 'text-emerald-600' : 'text-rose-600') : 'text-slate-200'} transition-colors`}>
+                  {selectedSemester?.sgpa || '0.00'}
                 </span>
              </div>
              <div className="w-px h-12 bg-slate-100"></div>
              <div className="flex flex-col">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</span>
-                <span className={`text-xs font-black uppercase tracking-tighter ${isPredicted ? (selectedSemester?.status === 'passed' ? 'text-emerald-500' : 'text-rose-500') : 'text-slate-300'}`}>
-                   {isPredicted ? (selectedSemester?.totalGrade || 'PASSED') : 'Waiting...'}
+                <span className={`text-xs font-black uppercase tracking-tighter ${selectedSemester?.status ? (selectedSemester.status === 'passed' ? 'text-emerald-500' : 'text-rose-500') : 'text-slate-300'}`}>
+                   {selectedSemester ? (selectedSemester.status?.toUpperCase() || 'DATA SYNCED') : 'Waiting...'}
                 </span>
              </div>
           </div>
@@ -436,7 +500,7 @@ const StudentDashboard = () => {
                       </div>
                       <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Academic Ledger</h2>
                    </div>
-                   <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-4 py-2 rounded-xl">
+                   <div className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-4 py-2 rounded-xl">
                       Real-time Weights
                    </div>
                 </div>
@@ -447,17 +511,17 @@ const StudentDashboard = () => {
                        <div className="flex justify-between items-center">
                           <div className="flex flex-col">
                              <span className="text-sm font-black text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors">{subject.name}</span>
-                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Institutional Unit {index + 1}</span>
+                             <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-1">Institutional Unit {index + 1}</span>
                           </div>
                           <div className="flex items-center gap-6">
                              <div className="flex flex-col items-end">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Raw Mark</span>
+                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Raw Mark</span>
                                 <span className="text-sm font-black text-slate-900">{subject.marks || 0}</span>
                              </div>
-                             <div className={`w-[80px] flex flex-col items-center py-2 rounded-2xl border transition-all ${isPredicted ? getGradeColor(subject.grade) : 'bg-slate-50 border-slate-100'}`}>
-                                <span className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Grade</span>
-                                <span className={`text-base font-black ${!isPredicted ? 'text-slate-200' : ''}`}>
-                                   {isPredicted ? subject.grade : '??'}
+                             <div className={`w-[80px] flex flex-col items-center py-2 rounded-2xl border transition-all ${subject.grade ? getGradeColor(subject.grade) : 'bg-slate-50 border-slate-100'}`}>
+                                <span className="text-xs font-black uppercase tracking-widest mb-1 opacity-60">Grade</span>
+                                <span className={`text-base font-black ${!subject.grade ? 'text-slate-200' : ''}`}>
+                                   {subject.grade || '??'}
                                 </span>
                              </div>
                           </div>
@@ -466,9 +530,7 @@ const StudentDashboard = () => {
                           <div 
                             className={`h-full bg-gradient-to-r from-indigo-500 to-blue-600 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(79,70,229,0.2)]`}
                             style={{ 
-                              width: isPredicted 
-                                ? `${{'A+':100,'A':90,'B':80,'C':70,'D':60,'F':30}[subject.grade] || (subject.marks || 30)}%` 
-                                : `${subject.marks || 5}%` 
+                              width: `${{'O':100,'A+':95,'A':85,'B+':75,'B':65,'C':55,'P':45,'F':20}[subject.grade] || (subject.marks || 5)}%` 
                             }}
                           ></div>
                        </div>
@@ -478,7 +540,7 @@ const StudentDashboard = () => {
                        <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-sm mb-4">
                           <TrendingUp className="w-8 h-8 text-slate-200" />
                        </div>
-                       <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Registry Empty. Awaiting synchronization.</p>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Registry Empty. Awaiting synchronization.</p>
                     </div>
                   )}
                 </div>

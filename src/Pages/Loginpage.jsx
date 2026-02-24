@@ -87,8 +87,8 @@ export default function LoginPage() {
         <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 border border-gray-100 transition-all">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="mb-6">
-              <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-1">Authentication Protocol</p>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Student login</h2>
+              <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-1">student/teaher login </p>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase"> login</h2>
             </div>
 
             <div className="space-y-4">

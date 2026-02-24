@@ -45,36 +45,54 @@ const StudentModal = ({ student, onSave, onClose }) => {
     if (validateForm()) onSave(formData);
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  const DEPARTMENTS = {
+    'Computer Science': [
+      'BCA Honours',
+      'BSc Computer Science',
+      'BSc Information Technology',
+      'MSc Computer Science',
+      'MCA (Master of Computer Applications)'
+    ],
+    'Commerce': [
+      'Bcom Finance',
+      'Bcom Computer Application',
+      'Bcom Co-operation Honours',
+      'Mcom Finance'
+    ],
+    'Business Administration': [
+      'BBA Honours'
+    ],
+    'Physics': [
+      'BSC Physics'
+    ],
+    'Arts & Humanities': [
+      'BA English Language and Literature Honours',
+      'BA Economics',
+      'MA English',
+      'BA Malayalam',
+      'BA Sociology',
+      'BA History'
+    ],
+    'AI': [
+      'B.Sc. ARTIFICIAL INTELLIGENCE (HONOURS)'
+    ]
   };
 
-  const courses = [
-    'BA English Language and Literature Honours',
-    'BA Economics',
-    'BBA Honours',
-    'BCA Honours',
-    'BSC Physics',
-    'Bcom Co-operation Honours',
-    'Bcom Computer Application',
-    'Bcom Finance',
-    'Mcom Finance',
-    'MA English',
-    'B.Sc. ARTIFICIAL INTELLIGENCE (HONOURS)'
-  ];
-
-  const departments = [
-    'Computer Science',
-    'Commerce',
-    'Business Administration',
-    'Physics',
-    'Arts & Humanities',
-    'AI'
-  ];
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (name === 'department') {
+      setFormData(prev => ({
+        ...prev,
+        department: value,
+        course: '' // Reset course when department changes
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -166,7 +184,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
                 >
                   <option value="">Select Department</option>
-                  {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                  {Object.keys(DEPARTMENTS).map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
             </div>
@@ -183,7 +201,7 @@ const StudentModal = ({ student, onSave, onClose }) => {
                   className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
                 >
                   <option value="">Select Program</option>
-                  {courses.map(c => <option key={c} value={c}>{c}</option>)}
+                  {formData.department && DEPARTMENTS[formData.department].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
             </div>
