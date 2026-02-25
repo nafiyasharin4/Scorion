@@ -43,27 +43,27 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Socket connected:', newSocket.id);
+      console.log(' Socket connected:', newSocket.id);
       setIsConnected(true);
       newSocket.emit('register', userId);
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('❌ Socket connection error:', error.message);
+      console.error(' Socket connection error:', error.message);
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('⚠️ Socket disconnected:', reason);
+      console.log(' Socket disconnected:', reason);
       setIsConnected(false);
     });
 
     newSocket.on('new-notification', (data) => {
-      console.log('🔔 Received new notification:', data);
+      console.log(' Received new notification:', data);
       
       // EXTRA GUARD: Verifying role at time of reception
       const currentRole = localStorage.getItem('role');
       if (currentRole !== 'user') {
-        console.log('🚫 Suppressing student notification on non-student role:', currentRole);
+        console.log(' Suppressing student notification on non-student role:', currentRole);
         return;
       }
       
