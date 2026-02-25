@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -23,7 +25,7 @@ function MarkManagePage() {
       const headers = { Authorization: `Bearer ${token}` };
       
       // 1. Fetch all students
-      const studentsRes = await axios.get('http://localhost:5000/api/teacher/studentsearch/', { headers });
+      const studentsRes = await axios.get(`${API_BASE_URL}/api/teacher/studentsearch/`, { headers });
       if (!studentsRes.data.students) {
         toast.error('Failed to retrieve student roster');
         return;
@@ -31,7 +33,7 @@ function MarkManagePage() {
       const allStudents = studentsRes.data.students;
 
       // 2. Fetch all marks
-      const marksRes = await axios.get('http://localhost:5000/api/teacher/marks', { headers });
+      const marksRes = await axios.get(`${API_BASE_URL}/api/teacher/marks`, { headers });
       if (!marksRes.data.marks) {
         toast.error('Failed to retrieve mark records');
         return;
@@ -89,7 +91,7 @@ function MarkManagePage() {
 
       if (existingMark) {
         // Update existing mark
-        await axios.put(`http://localhost:5000/api/teacher/update/${existingMark._id}`, {
+        await axios.put(`${API_BASE_URL}/api/teacher/update/${existingMark._id}`, {
           ...markData,
           SGPA: markData.sgpa // Match backend field casing if necessary
         }, { headers });
@@ -101,7 +103,7 @@ function MarkManagePage() {
           semester,
           ...markData
         };
-        await axios.post('http://localhost:5000/api/teacher/add-mark', payload, { headers });
+        await axios.post(`${API_BASE_URL}/api/teacher/add-mark`, payload, { headers });
         toast.success(`Marks initialized for Semester ${semester}`);
       }
       
@@ -133,7 +135,7 @@ function MarkManagePage() {
           return;
         }
         
-        await axios.delete(`http://localhost:5000/api/teacher/delete-mark/${markRecord._id}`, {
+        await axios.delete(`${API_BASE_URL}/api/teacher/delete-mark/${markRecord._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success(`Semester ${semester} registry purged`);
@@ -243,3 +245,7 @@ function MarkManagePage() {
 }
 
 export default MarkManagePage;
+
+
+
+

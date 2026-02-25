@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -35,8 +37,8 @@ export default function LoginPage() {
     try {
       // Determine endpoint based on checkbox
       const endpoint = formData.isFaculty 
-        ? 'http://localhost:5000/api/teacher/login' 
-        : 'http://localhost:5000/api/user/login';
+        ? `${API_BASE_URL}/api/teacher/login` 
+        : `${API_BASE_URL}/api/user/login`;
       
       const response = await axios.post(endpoint, {
         email: formData.email,
@@ -200,3 +202,7 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
+
+

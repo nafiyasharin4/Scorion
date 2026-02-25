@@ -1,3 +1,5 @@
+
+
 import { GraduationCap, Bell } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +21,7 @@ function TeacherHeader() {
             const token = localStorage.getItem('teacherToken');
             if (!token) return;
             
-            const response = await axios.get('http://localhost:5000/api/teacher/notifications/unread-count', {
+            const response = await axios.get(`${API_BASE_URL}/api/teacher/notifications/unread-count`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotificationCount(response.data.count || 0);
@@ -107,3 +109,7 @@ function TeacherHeader() {
 }
 
 export default TeacherHeader
+
+
+
+

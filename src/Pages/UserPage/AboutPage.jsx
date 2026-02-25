@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { Target, TrendingUp, Users, Zap, ShieldCheck, Cpu, Network, GraduationCap, ArrowRight } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
@@ -13,7 +15,7 @@ export default function AboutPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/user/system-stats');
+        const res = await axios.get(`${API_BASE_URL}/api/user/system-stats`);
         if (res.data) {
           setStats(res.data);
         }
@@ -150,3 +152,7 @@ export default function AboutPage() {
     </div>
   );
 }
+
+
+
+

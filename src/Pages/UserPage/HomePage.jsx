@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { GraduationCap, TrendingUp, ShieldCheck, Activity } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
@@ -19,8 +21,8 @@ export default function GradePredictorHome() {
       const token = localStorage.getItem(tokenKey);
       
       const endpoint = role === 'teacher' 
-        ? 'http://localhost:5000/api/teacher/profile'
-        : 'http://localhost:5000/api/user/profile';
+        ? `${API_BASE_URL}/api/teacher/profile`
+        : `${API_BASE_URL}/api/user/profile`;
       
       const res = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
@@ -128,3 +130,7 @@ export default function GradePredictorHome() {
     </div>
   );
 }
+
+
+
+

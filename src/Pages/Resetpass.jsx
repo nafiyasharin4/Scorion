@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import { Eye, EyeOff, Lock, ArrowLeft, CheckCircle, ShieldCheck, Loader2 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -53,7 +55,7 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/user/reset-password', {
+      const res = await axios.post(`${API_BASE_URL}/api/user/reset-password`, {
         email,
         newPassword
       });
@@ -239,3 +241,7 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
+
+
+
+

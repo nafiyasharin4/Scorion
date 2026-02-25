@@ -1,3 +1,5 @@
+
+
 import { useState, useRef, useEffect } from 'react';
 import { Mail, ArrowLeft, Shield, Loader2 } from 'lucide-react';
 import { useNavigate ,useLocation} from 'react-router-dom';
@@ -74,8 +76,8 @@ export default function OTPVerification() {
     try {
       // Use different endpoints based on purpose
       const endpoint = purpose === 'forgot' 
-        ? "http://localhost:5000/api/user/forgot-password/verify-otp"
-        : "http://localhost:5000/api/user/verify-otp";
+        ? "${API_BASE_URL}/api/user/forgot-password/verify-otp"
+        : "${API_BASE_URL}/api/user/verify-otp";
 
       const res = await axios.post(endpoint, {
         email,
@@ -112,8 +114,8 @@ export default function OTPVerification() {
       // resend logic might need similar branching if resend endpoint is different
       // assuming register flow might have separate resend or uses the same
       const endpoint = purpose === 'forgot'
-        ? 'http://localhost:5000/api/user/forgot-password'
-        : 'http://localhost:5000/api/user/register'; // Or a dedicated resend endpoint if exists
+        ? `${API_BASE_URL}/api/user/forgot-password`
+        : `${API_BASE_URL}/api/user/register`; // Or a dedicated resend endpoint if exists
 
       // Note: If calling register again, it might fail if user already exists
       // Check if there is a dedicated resend-otp endpoint
@@ -237,3 +239,7 @@ export default function OTPVerification() {
     </div>
   );
 }
+
+
+
+

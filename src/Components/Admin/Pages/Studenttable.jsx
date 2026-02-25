@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import StudentList from '../Components/StudentManage/StudentList';
 import StudentModal from '../Components/StudentManage/StudentModal';
@@ -19,7 +21,7 @@ function StudentGradeTable() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/admin/students', {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/students`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
       });
       setStudents(res.data.students || []);
@@ -43,12 +45,12 @@ function StudentGradeTable() {
   const handleSaveStudent = async (studentData) => {
     try {
       if (editingStudent) {
-        await axios.put(`http://localhost:5000/api/admin/edit-student/${editingStudent._id}`, studentData, {
+        await axios.put(`${API_BASE_URL}/api/admin/edit-student/${editingStudent._id}`, studentData, {
           headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
         });
         toast.success('Student updated');
       } else {
-        await axios.post('http://localhost:5000/api/admin/add-student', studentData, {
+        await axios.post(`${API_BASE_URL}/api/admin/add-student`, studentData, {
           headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
         });
         toast.success('Student added & invitation sent!');
@@ -61,8 +63,8 @@ function StudentGradeTable() {
   };
   const handleToggleBlock = async (student) => {
     const endpoint = student.isBlocked 
-      ? `http://localhost:5000/api/admin/unblock-student/${student._id}` 
-      : `http://localhost:5000/api/admin/block-student/${student._id}`;
+      ? `${API_BASE_URL}/api/admin/unblock-student/${student._id}` 
+      : `${API_BASE_URL}/api/admin/block-student/${student._id}`;
       
     try {
       await axios.put(endpoint, {}, {
@@ -144,3 +146,7 @@ function StudentGradeTable() {
 }
 
 export default StudentGradeTable;
+
+
+
+

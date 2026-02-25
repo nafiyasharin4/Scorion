@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BarChart3, TrendingUp, BookOpen, Award, Calendar, Target, AlertCircle, Clock, Users, Megaphone, FileText, Settings } from 'lucide-react';
@@ -27,7 +29,7 @@ export default function FacultyDashboard() {
 
     try {
       const token = localStorage.getItem('teacherToken');
-      await axios.post('http://localhost:5000/api/teacher/dept-alert', 
+      await axios.post(`${API_BASE_URL}/api/teacher/dept-alert`, 
         { title, message, severity: 'warning' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -51,13 +53,13 @@ export default function FacultyDashboard() {
     try {
       const token = localStorage.getItem('teacherToken');
       const [stuRes, markRes, profileRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/teacher/studentsearch/', {
+        axios.get(`${API_BASE_URL}/api/teacher/studentsearch/`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5000/api/teacher/marks', {
+        axios.get(`${API_BASE_URL}/api/teacher/marks`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5000/api/teacher/profile', {
+        axios.get(`${API_BASE_URL}/api/teacher/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -350,3 +352,7 @@ export default function FacultyDashboard() {
     </div>
   );
 }
+
+
+
+

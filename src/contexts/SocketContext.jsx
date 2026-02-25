@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 
+
+
 const SocketContext = createContext(null);
 
 export const useSocket = () => useContext(SocketContext);
@@ -35,7 +37,7 @@ export const SocketProvider = ({ children }) => {
 
     if (!userId) return null;
 
-    const newSocket = io('http://localhost:5000', {
+    const newSocket = io(API_BASE_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
@@ -151,3 +153,5 @@ export const SocketProvider = ({ children }) => {
 };
 
 export default SocketContext;
+
+

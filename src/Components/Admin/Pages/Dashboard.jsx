@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BarChart3, TrendingUp, BookOpen, Award, Calendar, Target, AlertCircle, Clock, Zap, Star, Megaphone, FileText, ShieldCheck } from 'lucide-react';
@@ -33,7 +35,7 @@ export default function Dashboard() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.post('http://localhost:5000/api/admin/broadcast-global', 
+      await axios.post(`${API_BASE_URL}/api/admin/broadcast-global`, 
         { title, message, severity: 'critical' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -56,7 +58,7 @@ export default function Dashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://localhost:5000/api/admin/stats', {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStats(res.data.stats);
@@ -283,3 +285,7 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+
+

@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, BookOpen, TrendingUp, Award, GraduationCap, Activity, ChevronDown, FileText, Table, Download, AlertTriangle } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
@@ -39,8 +41,8 @@ const StudentDashboard = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const [profileRes, marksRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/user/profile', config),
-        axios.get('http://localhost:5000/api/user/marks', config)
+        axios.get(`${API_BASE_URL}/api/user/profile`, config),
+        axios.get(`${API_BASE_URL}/api/user/marks`, config)
       ]);
 
       setProfile(profileRes.data);
@@ -81,7 +83,7 @@ const StudentDashboard = () => {
       
       // 2. Fetch the Syllabus for the NEXT semester
       const token = localStorage.getItem('userToken');
-      const response = await axios.get(`http://localhost:5000/api/user/syllabus/${nextSemNumber}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/user/syllabus/${nextSemNumber}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -613,3 +615,7 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
+
+
+
+

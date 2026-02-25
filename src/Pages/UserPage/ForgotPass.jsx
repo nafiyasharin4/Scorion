@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +20,7 @@ export default function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/user/forgot-password', { email });
+      const res = await axios.post(`${API_BASE_URL}/api/user/forgot-password`, { email });
       if (res.data.success) {    
         toast.success(res.data.message || 'OTP sent successfully!');
         //  Navigate to OTP page and pass email
@@ -110,3 +112,7 @@ export default function ForgotPassword() {
     </div>
   );
 }
+
+
+
+

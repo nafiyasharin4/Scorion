@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -22,7 +24,7 @@ function TeacherStuendtTable() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/teacher/studentsearch/', {
+      const response = await axios.get(`${API_BASE_URL}/api/teacher/studentsearch/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('teacherToken')}`
         }
@@ -96,7 +98,7 @@ function TeacherStuendtTable() {
     try {
       // Fetch student marks
       const token = localStorage.getItem('teacherToken');
-      const response = await axios.get(`http://localhost:5000/api/teacher/marks?studentId=${student.id}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/teacher/marks?studentId=${student.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -207,3 +209,7 @@ function TeacherStuendtTable() {
 }
 
 export default TeacherStuendtTable;
+
+
+
+

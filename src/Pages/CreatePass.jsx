@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -57,13 +59,13 @@ function CreatePasswordPage() {
       let finalMessage = "";
 
       try {
-        const studentRes = await axios.post(`http://localhost:5000/api/user/createpassword/${token}`, { password });
+        const studentRes = await axios.post(`${API_BASE_URL}/api/user/createpassword/${token}`, { password });
         success = true;
         finalMessage = studentRes.data.message;
       } catch (err) {
         // If student route fails, try teacher route
         try {
-          const teacherRes = await axios.post(`http://localhost:5000/api/teacher/createpassword/${token}`, { password });
+          const teacherRes = await axios.post(`${API_BASE_URL}/api/teacher/createpassword/${token}`, { password });
           success = true;
           finalMessage = teacherRes.data.message;
         } catch (err2) {
@@ -242,3 +244,7 @@ function CreatePasswordPage() {
 }
 
 export default CreatePasswordPage;
+
+
+
+

@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
@@ -30,7 +32,7 @@ export default function NotificationPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('userToken');
-      const response = await axios.get('http://localhost:5000/api/user/notifications', {
+      const response = await axios.get(`${API_BASE_URL}/api/user/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success || response.data.notifications) {
@@ -49,7 +51,7 @@ export default function NotificationPage() {
   const markAsRead = async (id) => {
     try {
       const token = localStorage.getItem('userToken');
-      await axios.put(`http://localhost:5000/api/user/notifications/${id}/read`, {}, {
+      await axios.put(`${API_BASE_URL}/api/user/notifications/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(notifications.map(n => 
@@ -63,7 +65,7 @@ export default function NotificationPage() {
   const markAllAsRead = async () => {
     try {
       const token = localStorage.getItem('userToken');
-      await axios.put('http://localhost:5000/api/user/notifications/mark-all-read', {}, {
+      await axios.put(`${API_BASE_URL}/api/user/notifications/mark-all-read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(notifications.map(n => ({ ...n, isRead: true })));
@@ -318,3 +320,7 @@ export default function NotificationPage() {
     </div>
   );
 }
+
+
+
+

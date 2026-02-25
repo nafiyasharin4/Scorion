@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import Header from '../../Components/UserSide/Header';
 import { User, Mail, Shield, Book, Award, Clock, ChevronRight, Settings, LogOut, Phone, MapPin, GraduationCap, Briefcase, Activity, Layers } from 'lucide-react';
@@ -24,8 +26,8 @@ export default function Profile() {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const endpoint = role === 'teacher' 
-        ? 'http://localhost:5000/api/teacher/profile'
-        : 'http://localhost:5000/api/user/profile';
+        ? `${API_BASE_URL}/api/teacher/profile`
+        : `${API_BASE_URL}/api/user/profile`;
 
       const res = await axios.get(endpoint, config);
       if (res.data) {
@@ -35,7 +37,7 @@ export default function Profile() {
       }
 
       if (role === 'user') {
-        const marksRes = await axios.get('http://localhost:5000/api/user/marks', config);
+        const marksRes = await axios.get(`${API_BASE_URL}/api/user/marks`, config);
         if (marksRes.data && marksRes.data.marks) {
           setMarks(marksRes.data.marks);
         } else if (marksRes.data.message) {
@@ -279,3 +281,7 @@ export default function Profile() {
     </div>
   );
 }
+
+
+
+

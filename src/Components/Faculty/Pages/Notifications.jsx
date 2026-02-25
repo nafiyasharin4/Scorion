@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
@@ -30,7 +32,7 @@ export default function FacultyNotificationPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('teacherToken');
-      const response = await axios.get('http://localhost:5000/api/teacher/notifications', {
+      const response = await axios.get(`${API_BASE_URL}/api/teacher/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(response.data.notifications || []);
@@ -45,7 +47,7 @@ export default function FacultyNotificationPage() {
   const markAsRead = async (id) => {
     try {
       const token = localStorage.getItem('teacherToken');
-      await axios.put(`http://localhost:5000/api/teacher/notifications/${id}/read`, {}, {
+      await axios.put(`${API_BASE_URL}/api/teacher/notifications/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(notifications.map(n => 
@@ -59,7 +61,7 @@ export default function FacultyNotificationPage() {
   const markAllAsRead = async () => {
     try {
       const token = localStorage.getItem('teacherToken');
-      await axios.put('http://localhost:5000/api/teacher/notifications/mark-all-read', {}, {
+      await axios.put(`${API_BASE_URL}/api/teacher/notifications/mark-all-read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(notifications.map(n => ({ ...n, isRead: true })));
@@ -239,3 +241,7 @@ export default function FacultyNotificationPage() {
     </div>
   );
 }
+
+
+
+

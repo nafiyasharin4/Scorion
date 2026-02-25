@@ -381,3 +381,5 @@ const SubjectAnalytics = ({ marks }) => {
 };
 
 export default SubjectAnalytics;
+
+

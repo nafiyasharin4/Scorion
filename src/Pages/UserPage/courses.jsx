@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, 
@@ -30,7 +32,7 @@ export default function SyllabusPage() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('userToken');
-      const response = await axios.get('http://localhost:5000/api/user/profile', {
+      const response = await axios.get(`${API_BASE_URL}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfile(response.data);
@@ -136,7 +138,7 @@ export default function SyllabusPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem('userToken');
-      const response = await axios.get(`http://localhost:5000/api/user/syllabus/${activeSemester}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/user/syllabus/${activeSemester}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -371,3 +373,7 @@ export default function SyllabusPage() {
     </div>
   );
 }
+
+
+
+

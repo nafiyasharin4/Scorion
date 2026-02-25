@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import TeacherList from '../Components/TeacherManage/TeacherList';
 import TeacherModal from '../Components/TeacherManage/TeacherModal';
@@ -19,7 +21,7 @@ function FacultyGradePage() {
   const fetchTeachers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/admin/teachers', {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/teachers`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
       });
       setTeachers(res.data.teachers || []);
@@ -44,12 +46,12 @@ function FacultyGradePage() {
   const handleSaveTeacher = async (teacherData) => {
     try {
       if (editingTeacher) {
-        await axios.put(`http://localhost:5000/api/admin/edit-teacher/${editingTeacher._id}`, teacherData, {
+        await axios.put(`${API_BASE_URL}/api/admin/edit-teacher/${editingTeacher._id}`, teacherData, {
           headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
         });
         toast.success('Teacher updated successfully');
       } else {
-        await axios.post('http://localhost:5000/api/admin/add-teacher', teacherData, {
+        await axios.post(`${API_BASE_URL}/api/admin/add-teacher`, teacherData, {
           headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
         });
         toast.success('Teacher added and invite email sent!');
@@ -62,8 +64,8 @@ function FacultyGradePage() {
   };
   const handleToggleBlock = async (teacher) => {
     const endpoint = teacher.isBlocked 
-      ? `http://localhost:5000/api/admin/unblockteacher/${teacher._id}` 
-      : `http://localhost:5000/api/admin/blockteacher/${teacher._id}`;
+      ? `${API_BASE_URL}/api/admin/unblockteacher/${teacher._id}` 
+      : `${API_BASE_URL}/api/admin/blockteacher/${teacher._id}`;
       
     try {
       await axios.put(endpoint, {}, {
@@ -169,3 +171,7 @@ function FacultyGradePage() {
 }
 
 export default FacultyGradePage;
+
+
+
+

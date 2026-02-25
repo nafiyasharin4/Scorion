@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, GraduationCap, Loader2 } from 'lucide-react';
 import axios from 'axios';
@@ -35,7 +37,7 @@ export default function DashboardLoginPage() {
     if (validateForm()) {
       setLoading(true);
       try {
-        const response = await axios.post('http://localhost:5000/api/teacher/login', { email, password });
+        const response = await axios.post(`${API_BASE_URL}/api/teacher/login`, { email, password });
         
         if (response.data.token) {
           // Keep user data but just add teacher data (allows testing in same browser)
@@ -172,3 +174,7 @@ export default function DashboardLoginPage() {
     </div>
   );
 }
+
+
+
+

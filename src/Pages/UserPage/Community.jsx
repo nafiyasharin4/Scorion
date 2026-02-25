@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { 
   MessageCircle, 
@@ -53,7 +55,7 @@ export default function CommunityPage() {
     if (text?.trim()) {
       try {
         const token = localStorage.getItem('userToken');
-        await axios.post(`http://localhost:5000/api/user/community/posts/${postId}/reply`, {
+        await axios.post(`${API_BASE_URL}/api/user/community/posts/${postId}/reply`, {
           text
         }, {
           headers: { Authorization: `Bearer ${token}` }
@@ -71,7 +73,7 @@ export default function CommunityPage() {
   const fetchFaculty = async () => {
     try {
       const token = localStorage.getItem('userToken');
-      const response = await axios.get('http://localhost:5000/api/user/faculty', {
+      const response = await axios.get(`${API_BASE_URL}/api/user/faculty`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Map backend data to UI format
@@ -93,7 +95,7 @@ export default function CommunityPage() {
   const fetchPosts = async () => {
     try {
       const token = localStorage.getItem('userToken');
-      const response = await axios.get('http://localhost:5000/api/user/community/posts', {
+      const response = await axios.get(`${API_BASE_URL}/api/user/community/posts`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPosts(response.data);
@@ -123,7 +125,7 @@ export default function CommunityPage() {
     if (newMessage.trim()) {
       try {
         const token = localStorage.getItem('userToken');
-        const response = await axios.post('http://localhost:5000/api/user/community/posts', {
+        const response = await axios.post(`${API_BASE_URL}/api/user/community/posts`, {
           text: newMessage,
           tags: ['General'],
           isSuccessStory: newMessage.toLowerCase().includes('grade') || newMessage.toLowerCase().includes('sgpa')
@@ -143,7 +145,7 @@ export default function CommunityPage() {
   const handleLike = async (postId) => {
     try {
       const token = localStorage.getItem('userToken');
-      await axios.put(`http://localhost:5000/api/user/community/posts/${postId}/like`, {}, {
+      await axios.put(`${API_BASE_URL}/api/user/community/posts/${postId}/like`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Refresh posts or update locally
@@ -448,3 +450,7 @@ export default function CommunityPage() {
     </div>
   );
 }
+
+
+
+

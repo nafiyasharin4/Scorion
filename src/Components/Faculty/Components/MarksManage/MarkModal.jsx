@@ -1,3 +1,5 @@
+
+
 // MarkModal.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -41,7 +43,7 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
     try {
       setSyllabusLoading(true);
       const token = localStorage.getItem('teacherToken');
-      const response = await axios.get(`http://localhost:5000/api/teacher/student-syllabus/${student.id}/${formData.semester}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/teacher/student-syllabus/${student.id}/${formData.semester}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSyllabus(response.data);
@@ -390,3 +392,7 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
 };
 
 export default MarkModal;
+
+
+
+

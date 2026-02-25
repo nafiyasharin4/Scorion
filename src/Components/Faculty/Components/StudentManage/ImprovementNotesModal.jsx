@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Save, X, AlertCircle, CheckCircle, Sparkles } from 'lucide-react';
 import axios from 'axios';
@@ -72,7 +74,7 @@ const ImprovementNotesModal = ({ student, marks, onClose, onUpdate }) => {
       };
 
       await axios.post(
-        'http://localhost:5000/api/teacher/students/improvement-notes',
+        `${API_BASE_URL}/api/teacher/students/improvement-notes`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -213,3 +215,7 @@ const ImprovementNotesModal = ({ student, marks, onClose, onUpdate }) => {
 };
 
 export default ImprovementNotesModal;
+
+
+
+

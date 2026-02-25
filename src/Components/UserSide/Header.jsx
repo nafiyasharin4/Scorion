@@ -1,3 +1,5 @@
+
+
 import { GraduationCap, Bell, User, Menu, X, LogOut, BookOpen, Users, LayoutDashboard } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
@@ -38,7 +40,7 @@ function Header() {
             const token = localStorage.getItem('userToken');
             if (!token) return;
             
-            const response = await axios.get('http://localhost:5000/api/user/notifications/unread-count', {
+            const response = await axios.get(`${API_BASE_URL}/api/user/notifications/unread-count`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotificationCount(response.data.count || 0);
@@ -189,3 +191,7 @@ function Header() {
 }
 
 export default Header;
+
+
+
+
