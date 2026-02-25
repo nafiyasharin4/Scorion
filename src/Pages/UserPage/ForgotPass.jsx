@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../config';
 import { useState } from 'react';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -112,7 +111,3 @@ export default function ForgotPassword() {
     </div>
   );
 }
-
-
-
-

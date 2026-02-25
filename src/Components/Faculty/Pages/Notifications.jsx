@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../../config';
 import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
@@ -241,7 +240,3 @@ export default function FacultyNotificationPage() {
     </div>
   );
 }
-
-
-
-

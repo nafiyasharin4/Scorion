@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../../../config';
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Save, X, AlertCircle, CheckCircle, Sparkles } from 'lucide-react';
 import axios from 'axios';
@@ -215,7 +214,3 @@ const ImprovementNotesModal = ({ student, marks, onClose, onUpdate }) => {
 };
 
 export default ImprovementNotesModal;
-
-
-
-

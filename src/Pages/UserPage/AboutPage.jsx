@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Target, TrendingUp, Users, Zap, ShieldCheck, Cpu, Network, GraduationCap, ArrowRight } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
@@ -152,7 +151,3 @@ export default function AboutPage() {
     </div>
   );
 }
-
-
-
-

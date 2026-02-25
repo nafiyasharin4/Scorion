@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../../config';
 import React, { useState, useEffect } from 'react';
 import TeacherList from '../Components/TeacherManage/TeacherList';
 import TeacherModal from '../Components/TeacherManage/TeacherModal';
@@ -171,7 +170,3 @@ function FacultyGradePage() {
 }
 
 export default FacultyGradePage;
-
-
-
-

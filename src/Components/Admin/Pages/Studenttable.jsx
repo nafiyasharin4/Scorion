@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../../config';
 import React, { useState, useEffect } from 'react';
 import StudentList from '../Components/StudentManage/StudentList';
 import StudentModal from '../Components/StudentManage/StudentModal';
@@ -146,7 +145,3 @@ function StudentGradeTable() {
 }
 
 export default StudentGradeTable;
-
-
-
-

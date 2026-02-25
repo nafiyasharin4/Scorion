@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../config';
 import { GraduationCap, Bell, User, Menu, X, LogOut, BookOpen, Users, LayoutDashboard } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
@@ -191,7 +190,3 @@ function Header() {
 }
 
 export default Header;
-
-
-
-

@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../config';
 import { useState } from 'react';
 import { User, Mail, Phone, Lock, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
@@ -111,7 +110,7 @@ export default function RegisterPage() {
         if (Object.keys(newErrors).length === 0) {
             setLoading(true);
             try {
-                const response = await axios.post("${API_BASE_URL}/api/user/register", {
+                const response = await axios.post(`${API_BASE_URL}/api/user/register`, {
                     name: formData.name,
                     email: formData.email,
                     phone: formData.phone,
@@ -359,7 +358,3 @@ export default function RegisterPage() {
         </div>
     );
 }
-
-
-
-

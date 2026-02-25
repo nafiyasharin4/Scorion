@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../../config';
 import { GraduationCap, Bell } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
@@ -109,7 +108,3 @@ function TeacherHeader() {
 }
 
 export default TeacherHeader
-
-
-
-

@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../config';
 import { useState } from 'react';
 import { Eye, EyeOff, Lock, ArrowLeft, CheckCircle, ShieldCheck, Loader2 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -241,7 +240,3 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
-
-
-
-

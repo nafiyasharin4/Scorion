@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { GraduationCap, TrendingUp, ShieldCheck, Activity } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
@@ -130,7 +129,3 @@ export default function GradePredictorHome() {
     </div>
   );
 }
-
-
-
-

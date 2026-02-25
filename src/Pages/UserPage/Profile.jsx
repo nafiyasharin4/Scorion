@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import Header from '../../Components/UserSide/Header';
 import { User, Mail, Shield, Book, Award, Clock, ChevronRight, Settings, LogOut, Phone, MapPin, GraduationCap, Briefcase, Activity, Layers } from 'lucide-react';
@@ -281,7 +280,3 @@ export default function Profile() {
     </div>
   );
 }
-
-
-
-

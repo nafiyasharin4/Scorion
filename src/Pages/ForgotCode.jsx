@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../config';
 import { useState, useRef, useEffect } from 'react';
 import { Mail, ArrowLeft, Shield, Loader2 } from 'lucide-react';
 import { useNavigate ,useLocation} from 'react-router-dom';
@@ -76,8 +75,8 @@ export default function OTPVerification() {
     try {
       // Use different endpoints based on purpose
       const endpoint = purpose === 'forgot' 
-        ? "${API_BASE_URL}/api/user/forgot-password/verify-otp"
-        : "${API_BASE_URL}/api/user/verify-otp";
+        ? `${API_BASE_URL}/api/user/forgot-password/verify-otp`
+        : `${API_BASE_URL}/api/user/verify-otp`;
 
       const res = await axios.post(endpoint, {
         email,
@@ -239,7 +238,3 @@ export default function OTPVerification() {
     </div>
   );
 }
-
-
-
-

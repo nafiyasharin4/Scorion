@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, BookOpen, TrendingUp, Award, GraduationCap, Activity, ChevronDown, FileText, Table, Download, AlertTriangle } from 'lucide-react';
 import Header from '../../Components/UserSide/Header';
@@ -615,7 +614,3 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
-
-
-
-

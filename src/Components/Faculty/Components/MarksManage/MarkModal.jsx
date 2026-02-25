@@ -1,5 +1,4 @@
-
-
+import { API_BASE_URL } from '../../../../config';
 // MarkModal.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -392,7 +391,3 @@ const MarkModal = ({ student, semester, onSave, onClose }) => {
 };
 
 export default MarkModal;
-
-
-
-
