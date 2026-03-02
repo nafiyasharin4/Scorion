@@ -1,2 +1,3 @@
-export const API_BASE_URL = 'http://localhost:5000';
-// export const API_BASE_URL = 'https://scorion-backend.onrender.com';
+// export const API_BASE_URL = 'http://localhost:5000';
+export const API_BASE_URL = 'https://scorion-backend.onrender.com'; 
+// added render backend link
