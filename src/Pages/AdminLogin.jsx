@@ -1,6 +1,4 @@
 import { API_BASE_URL } from '../config';
-
-
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, GraduationCap, Loader2, ShieldAlert } from 'lucide-react';
 import axios from 'axios';
@@ -27,8 +25,6 @@ export default function AdminLogin() {
     setLoading(true);
     try {
       const response = await axios.post(`${API_BASE_URL}/api/admin/login`, formData);
-      
-      
       if (response.data.token) {
         localStorage.setItem('adminToken', response.data.token);
         localStorage.setItem('role', 'admin');
